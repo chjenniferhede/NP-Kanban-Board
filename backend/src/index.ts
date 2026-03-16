@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
+import cors from "cors";
 import taskRouter from "./routes/task.js";
 
 // Load environment variables from .env
@@ -11,6 +12,12 @@ const PORT = process.env.PORT || 3000;
 
 // --- Middleware ---
 app.use(morgan("dev"));
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+}));
 app.use(express.json());
 
 // --- Routes ---

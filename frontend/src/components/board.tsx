@@ -13,9 +13,10 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import type { Task } from "../types";
 import { tasksAtom, useTasks } from "../hooks/useTasks";
+import { sessionAtom } from "../hooks/useAuth";
 import Column from "./column/column";
 import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";
@@ -58,7 +59,8 @@ export default function Board() {
   const [filterAssignee, setFilterAssignee] = useState("");
   const [filterLabel, setFilterLabel]       = useState("");
 
-  useEffect(() => { fetchTasks(); }, []);
+  const session = useAtomValue(sessionAtom);
+  useEffect(() => { if (session) fetchTasks(); }, [session?.userId]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })

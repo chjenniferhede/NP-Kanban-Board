@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { Task } from "../types";
 import { useTasks } from "../hooks/useTasks";
 
@@ -14,6 +15,8 @@ export default function NewTaskWindow() {
   const [description, setDescription] = useState("");
   const [priority, setPriority]       = useState<Task["priority"]>(undefined);
   const [dueDate, setDueDate]         = useState("");
+  const [submitting, setSubmitting]   = useState(false);
+  const [toast, setToast]             = useState("");
 
   function reset() {
     setTitle("");
@@ -24,14 +27,22 @@ export default function NewTaskWindow() {
 
   async function handleAdd() {
     if (!title.trim()) return;
-    await createTask({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      priority: priority || undefined,
-      dueDate: dueDate || undefined,
-    });
-    reset();
-    (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
+    setSubmitting(true);
+    try {
+      await createTask({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        priority: priority || undefined,
+        dueDate: dueDate || undefined,
+      });
+      reset();
+      (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
+    } catch {
+      setToast("Failed to create task. Try again.");
+      setTimeout(() => setToast(""), 4000);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function handleClose() {
@@ -40,6 +51,15 @@ export default function NewTaskWindow() {
   }
 
   return (
+    <>
+    {toast && createPortal(
+      <div className="toast toast-top toast-center" style={{ zIndex: 9999 }}>
+        <div className="alert alert-error">
+          <span>{toast}</span>
+        </div>
+      </div>,
+      document.body
+    )}
     <dialog id={MODAL_ID} className="modal backdrop:backdrop-blur-sm">
       <div className="modal-box flex flex-col gap-4">
         <h3 className="font-bold text-lg">New task</h3>
@@ -99,8 +119,8 @@ export default function NewTaskWindow() {
 
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={handleClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleAdd} disabled={!title.trim()}>
-            Add task
+          <button className="btn btn-primary" onClick={handleAdd} disabled={!title.trim() || submitting}>
+            {submitting ? <span className="loading loading-spinner loading-xs" /> : "Add task"}
           </button>
         </div>
       </div>
@@ -110,5 +130,6 @@ export default function NewTaskWindow() {
         <button onClick={reset}>close</button>
       </form>
     </dialog>
+    </>
   );
 }

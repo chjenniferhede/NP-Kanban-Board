@@ -15,12 +15,13 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import { useAtom, useAtomValue } from "jotai";
 import type { Task } from "../types";
-import { tasksAtom, useTasks } from "../hooks/useTasks";
+import { tasksAtom, useTasks, fetchErrorCodeAtom } from "../hooks/useTasks";
 import { sessionAtom } from "../hooks/useAuth";
 import Column from "./column/column";
 import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";
 import Bar from "./bar";
+
 
 const COLUMNS = [
   { key: "todo",        label: "To Do",       accent: "bg-red-400" },
@@ -52,7 +53,8 @@ const collisionDetection: CollisionDetection = (args) => {
 
 export default function Board() {
   const [tasks, setTasks] = useAtom(tasksAtom);
-  const { fetchTasks, updateTask } = useTasks();
+  const { fetchTasks, updateTask, loading, fetchError } = useTasks();
+  const fetchErrorCode = useAtomValue(fetchErrorCodeAtom);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const [filterPriority, setFilterPriority] = useState("");
@@ -123,6 +125,34 @@ export default function Board() {
     setActiveTask(null);
   }
 
+  if (fetchError) {
+    return (
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Bar
+          priority={filterPriority}
+          assignee={filterAssignee}
+          label={filterLabel}
+          onPriorityChange={setFilterPriority}
+          onAssigneeChange={setFilterAssignee}
+          onLabelChange={setFilterLabel}
+        />
+        <div className="flex flex-col items-center justify-center flex-1 gap-3 text-center">
+          <p className="text-5xl">⚠️</p>
+          <h2 className="text-2xl font-bold">We can't load your board</h2>
+          <p className="text-base-content/50 text-sm">
+            The board failed to load. Please try again.
+          </p>
+          {fetchErrorCode && (
+            <p className="text-xs text-base-content/30">Error code: {fetchErrorCode}</p>
+          )}
+          <button className="btn btn-primary btn-sm mt-2" onClick={fetchTasks}>
+            Go to board
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <Bar
@@ -134,33 +164,48 @@ export default function Board() {
         onLabelChange={setFilterLabel}
       />
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={collisionDetection}
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDragEnd={onDragEnd}
-      >
-        <div className="flex gap-4 flex-1 overflow-y-hidden pb-4">
-          {COLUMNS.map(({ key, label, accent }) => (
-            <Column
-              key={key}
-              columnKey={key}
-              title={label}
-              accent={accent}
-              tasks={tasks.filter((t) => t.status === key)}
-            />
-          ))}
-        </div>
-
-        <DragOverlay dropAnimation={{ duration: 200, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>
-          {activeTask && (
-            <div className="rotate-2 scale-105 opacity-95 shadow-xl">
-              <TaskCard task={activeTask} />
+      {loading ? (
+        <div className="flex gap-4 flex-1 overflow-y-hidden pb-4 relative overflow-hidden">
+          {COLUMNS.map(({ key, accent }) => (
+            <div key={key} className="bg-base-200 rounded-xl flex-1 flex flex-col overflow-hidden">
+              <div className={`${accent} h-1 w-full rounded-t-xl`} />
             </div>
-          )}
-        </DragOverlay>
-      </DndContext>
+          ))}
+          {/* single shimmer sweep across all columns */}
+          <div
+            className="absolute inset-0 pointer-events-none w-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+            style={{ animation: 'shimmer-sweep 2s ease-in-out infinite' }}
+          />
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={collisionDetection}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+        >
+          <div className="flex gap-4 flex-1 overflow-y-hidden pb-4">
+            {COLUMNS.map(({ key, label, accent }) => (
+              <Column
+                key={key}
+                columnKey={key}
+                title={label}
+                accent={accent}
+                tasks={tasks.filter((t) => t.status === key)}
+              />
+            ))}
+          </div>
+
+          <DragOverlay dropAnimation={{ duration: 200, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>
+            {activeTask && (
+              <div className="rotate-2 scale-105 opacity-95 shadow-xl">
+                <TaskCard task={activeTask} />
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
+      )}
 
       <NewTaskWindow />
     </div>

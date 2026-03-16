@@ -134,7 +134,7 @@ export default function Board() {
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
       >
-        <div className="flex gap-4 flex-1 overflow-x-auto pb-4">
+        <div className="flex gap-4 flex-1 overflow-y-hidden pb-4">
           {COLUMNS.map(({ key, label, accent }) => (
             <Column
               key={key}

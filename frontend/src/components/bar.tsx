@@ -43,7 +43,7 @@ export default function Bar({ priority, assignee, label, onPriorityChange, onAss
       </div>
 
       {/* New task button — w-72 matches column width */}
-      <button className="btn btn-primary w-72" onClick={openNewTaskModal}>
+      <button className="btn btn-primary" onClick={openNewTaskModal}>
         + New task
       </button>
     </div>

@@ -5,6 +5,7 @@ import type { Task, Comment } from "../types";
 import { useTasks } from "../hooks/useTasks";
 import { teamAtom } from "../hooks/useTeam";
 import { sessionAtom } from "../hooks/useAuth";
+import { meAtom } from "../hooks/useMe";
 import Tag from "./column/tag";
 import Dropdown from "./dropdown";
 
@@ -86,6 +87,8 @@ export default function CardDetails({ task, onClose }: Props) {
   const { updateTask } = useTasks();
   const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
+  const me = useAtomValue(meAtom);
+  const meId = session?.userId ?? "";
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentDraft, setCommentDraft] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -290,6 +293,17 @@ export default function CardDetails({ task, onClose }: Props) {
                     <i className="fa-regular fa-user text-base-content/50" style={{ fontSize: "11px" }} />
                   </button>
                 </div>
+                {/* Me */}
+                {meId && (
+                  <div className="tooltip tooltip-bottom" data-tip={me.name}>
+                    <button
+                      onClick={() => toggleAssignee(meId)}
+                      className={`${me.color} w-7 h-7 rounded-full text-white text-[9px] font-semibold flex items-center justify-center transition-all ${task.assigneeIds?.includes(meId) ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                    >
+                      {me.initials}
+                    </button>
+                  </div>
+                )}
                 {team.map((m) => {
                   const selected = task.assigneeIds?.includes(m.id);
                   return (

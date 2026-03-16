@@ -7,7 +7,7 @@ import { useAuth } from "./hooks/useAuth";
 export default function App() {
   useAuth();
   return (
-    <div className="flex flex-col h-screen bg-base-100">
+    <div className="flex flex-col h-screen bg-[#eeeeee]">
       <Header />
 
       <div className="flex flex-1 overflow-hidden">

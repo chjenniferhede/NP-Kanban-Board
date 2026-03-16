@@ -18,7 +18,7 @@ export default function Bar({ priority, assignee, label, onPriorityChange, onAss
           label="All priority"
           value={priority}
           onChange={onPriorityChange}
-          buttonClassName="btn btn-ghost btn-md border border-base-300 min-w-36 font-normal"
+          buttonClassName="btn btn-ghost btn-md border border-gray-300 min-w-36 font-normal"
           menuClassName="w-full"
           options={[
             { value: "", label: "All priority" },
@@ -31,7 +31,7 @@ export default function Bar({ priority, assignee, label, onPriorityChange, onAss
           label="All assignee"
           value={assignee}
           onChange={onAssigneeChange}
-          buttonClassName="btn btn-ghost btn-md border border-base-300 min-w-36 font-normal"
+          buttonClassName="btn btn-ghost border-gray-300 btn-md border border-base-300 min-w-36 font-normal"
           menuClassName="w-full"
           options={[{ value: "", label: "All assignee" }]}
         />
@@ -39,7 +39,7 @@ export default function Bar({ priority, assignee, label, onPriorityChange, onAss
           label="All label"
           value={label}
           onChange={onLabelChange}
-          buttonClassName="btn btn-ghost btn-md border border-base-300 min-w-36 font-normal"
+          buttonClassName="btn btn-ghost btn-md border border-gray-300 min-w-36 font-normal"
           menuClassName="w-full"
           options={[{ value: "", label: "All label" }]}
         />

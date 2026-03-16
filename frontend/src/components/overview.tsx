@@ -30,7 +30,7 @@ export default function Overview({ title }: Props) {
         const raw = localStorage.getItem("me-profile");
         const meProfile = raw ? JSON.parse(raw) : { name: "Me", initials: "ME", color: "bg-indigo-400" };
         const member = await createMember(meProfile);
-        if (member) localStorage.setItem("me-member-id", member.id);
+        localStorage.setItem("me-member-id", member.id);
       } catch {
         localStorage.removeItem("me-member-id");
       }

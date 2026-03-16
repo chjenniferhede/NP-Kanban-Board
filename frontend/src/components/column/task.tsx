@@ -70,7 +70,7 @@ export default function TaskCard({ task }: Props) {
             </span>
           ) : <span />}
           <div className="flex -space-x-1">
-            {Array.isArray(task.assigneeIds) && task.assigneeIds.length === 0 ? (
+            {assignees.length === 0 ? (
               <div className="tooltip tooltip-left" data-tip="Unassigned">
                 <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
                   <i className="fa-regular fa-user text-base-content/40" style={{ fontSize: "10px" }} />

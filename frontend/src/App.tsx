@@ -1,6 +1,7 @@
 import type { Task } from "./types";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
+import Overview from "./components/overview";
 import Column from "./components/column/column";
 
 // Placeholder tasks — replace with real API data later
@@ -15,10 +16,10 @@ const mockTasks: Task[] = [
 ];
 
 const COLUMNS = [
-  { key: "todo",        label: "To Do" },
-  { key: "in_progress", label: "In Progress" },
-  { key: "in_review",   label: "In Review" },
-  { key: "done",        label: "Done" },
+  { key: "todo",        label: "To Do",       accent: "bg-red-400" },
+  { key: "in_progress", label: "In Progress", accent: "bg-amber-400" },
+  { key: "in_review",   label: "In Review",   accent: "bg-blue-400" },
+  { key: "done",        label: "Done",         accent: "bg-green-400" },
 ];
 
 export default function App() {
@@ -29,18 +30,22 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
 
-        {/* Kanban board */}
-        <main className="flex-1 overflow-x-auto p-6">
-          <div className="flex gap-4 h-full">
-            {COLUMNS.map(({ key, label }) => (
+        <main className="flex-1 overflow-auto p-6 flex flex-col">
+          <Overview title="NP Kanban Board" />
+
+          {/* Kanban board */}
+          <div className="flex gap-4 flex-1">
+            {COLUMNS.map(({ key, label, accent }) => (
               <Column
                 key={key}
                 title={label}
+                accent={accent}
                 tasks={mockTasks.filter((t) => t.status === key)}
               />
             ))}
           </div>
         </main>
+
       </div>
     </div>
   );

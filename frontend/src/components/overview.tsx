@@ -21,7 +21,21 @@ export default function Overview({ title }: Props) {
   const [color, setColor] = useState(COLORS[0].value);
   const [adding, setAdding] = useState(false);
 
-  useEffect(() => { if (session) fetchTeam(); }, [session?.userId]);
+  useEffect(() => {
+    if (!session) return;
+    fetchTeam().then(async () => {
+      if (localStorage.getItem("me-member-id")) return;
+      localStorage.setItem("me-member-id", "pending");
+      try {
+        const raw = localStorage.getItem("me-profile");
+        const meProfile = raw ? JSON.parse(raw) : { name: "Me", initials: "ME", color: "bg-indigo-400" };
+        const member = await createMember(meProfile);
+        if (member) localStorage.setItem("me-member-id", member.id);
+      } catch {
+        localStorage.removeItem("me-member-id");
+      }
+    });
+  }, [session?.userId]);
 
   function getInitials(fullName: string) {
     return fullName.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);

@@ -7,9 +7,10 @@ type Props = {
   title: string;
   tasks: Task[];
   accent: string;
+  totalCount: number;
 };
 
-export default function Column({ columnKey, title, tasks, accent }: Props) {
+export default function Column({ columnKey, title, tasks, accent, totalCount }: Props) {
   // The whole column body is the droppable — works even when empty
   const { setNodeRef, isOver } = useDroppable({ id: columnKey });
 
@@ -23,7 +24,7 @@ export default function Column({ columnKey, title, tasks, accent }: Props) {
       >
         <div className="flex items-center gap-2 px-1">
           <h3 className="font-semibold text-sm">{title}</h3>
-          <span className="badge badge-ghost badge-sm">{tasks.length}</span>
+          <span className="badge badge-ghost badge-sm">{tasks.length} of {totalCount}</span>
         </div>
 
         <Tasks columnKey={columnKey} tasks={tasks} />

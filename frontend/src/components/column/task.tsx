@@ -45,7 +45,7 @@ export default function TaskCard({ task }: Props) {
         {...attributes}
         {...listeners}
         onClick={() => setOpen(true)}
-        className="bg-base-100 shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full"
+        className="bg-base-100 shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full transition-all duration-150 hover:-translate-y-0.3 hover:shadow-md"
       >
         {/* Top badge row */}
         {p && (

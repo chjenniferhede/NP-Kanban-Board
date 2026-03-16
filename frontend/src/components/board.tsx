@@ -24,10 +24,10 @@ import Bar from "./bar";
 
 
 const COLUMNS = [
-  { key: "todo",        label: "To Do",       accent: "bg-red-400" },
-  { key: "in_progress", label: "In Progress", accent: "bg-amber-400" },
-  { key: "in_review",   label: "In Review",   accent: "bg-blue-400" },
-  { key: "done",        label: "Done",        accent: "bg-green-400" },
+  { key: "todo",        label: "To Do",       accent: "bg-[#DA4D3F]" },
+  { key: "in_progress", label: "In Progress", accent: "bg-[#E8B402]" },
+  { key: "in_review",   label: "In Review",   accent: "bg-[#4D3F8D]" },
+  { key: "done",        label: "Done",        accent: "bg-[#007F47]" },
 ] as const;
 
 const collisionDetection: CollisionDetection = (args) => {
@@ -186,15 +186,24 @@ export default function Board() {
           onDragEnd={onDragEnd}
         >
           <div className="flex gap-4 flex-1 overflow-y-hidden pb-4">
-            {COLUMNS.map(({ key, label, accent }) => (
-              <Column
-                key={key}
-                columnKey={key}
-                title={label}
-                accent={accent}
-                tasks={tasks.filter((t) => t.status === key)}
-              />
-            ))}
+            {COLUMNS.map(({ key, label, accent }) => {
+              const columnTasks = tasks.filter((t) => t.status === key);
+              const displayed = columnTasks.filter((t) => {
+                if (filterPriority && t.priority !== filterPriority) return false;
+                if (filterAssignee && !t.assigneeIds?.includes(filterAssignee)) return false;
+                return true;
+              });
+              return (
+                <Column
+                  key={key}
+                  columnKey={key}
+                  title={label}
+                  accent={accent}
+                  tasks={displayed}
+                  totalCount={columnTasks.length}
+                />
+              );
+            })}
           </div>
 
           <DragOverlay dropAnimation={{ duration: 200, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>

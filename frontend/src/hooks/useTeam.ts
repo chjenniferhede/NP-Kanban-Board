@@ -21,28 +21,7 @@ export function useTeam() {
     if (!session) return;
     const res = await fetch(`${API}/api/team`, { headers: authHeaders() });
     if (!res.ok) return;
-    const data: TeamMember[] = await res.json();
-
-    const storedMeId = localStorage.getItem("me-member-id");
-    if (!storedMeId || !data.find((m) => m.id === storedMeId)) {
-      const raw = localStorage.getItem("me-profile");
-      const meProfile = raw
-        ? JSON.parse(raw)
-        : { name: "Me", initials: "ME", color: "bg-indigo-400" };
-      const seedRes = await fetch(`${API}/api/team`, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify(meProfile),
-      });
-      if (seedRes.ok) {
-        const member: TeamMember = await seedRes.json();
-        localStorage.setItem("me-member-id", member.id);
-        setTeam([...data, member]);
-        return;
-      }
-    }
-
-    setTeam(data);
+    setTeam(await res.json());
   }
 
   async function createMember(fields: Pick<TeamMember, "name" | "initials" | "color">) {

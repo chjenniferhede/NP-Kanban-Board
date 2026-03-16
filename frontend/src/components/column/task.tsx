@@ -23,10 +23,15 @@ export default function TaskCard({ task }: Props) {
   const priorityConfig = {
     high:   { label: "High",   cls: "bg-red-100   text-red-700" },
     normal: { label: "Medium", cls: "bg-yellow-100 text-yellow-700" },
-    low:    { label: "Low",    cls: "bg-base-200   text-base-content/50" },
+    low:    { label: "Low",    cls: "bg-base-300   text-base-content/60" },
   };
 
   const p = task.priority ? priorityConfig[task.priority] : null;
+
+  function formatDate(d: string) {
+    const [y, m, day] = d.split("-").map(Number);
+    return new Date(y, m - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
 
   return (
     <>
@@ -36,7 +41,7 @@ export default function TaskCard({ task }: Props) {
         {...attributes}
         {...listeners}
         onClick={() => setOpen(true)}
-        className="card bg-base-100 shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none"
+        className="bg-base-100 shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full"
       >
         {/* Top badge row */}
         {p && (
@@ -45,17 +50,25 @@ export default function TaskCard({ task }: Props) {
           </div>
         )}
 
-        <p className="font-medium text-md leading-snug">{task.title}</p>
+        <p className="font-medium text-md leading-snug pl-0.5">{task.title}</p>
 
         {task.description && (
-          <p className="text-xs text-base-content/60 line-clamp-2">
+          <p className="text-xs text-base-content/60 line-clamp-2 pl-1">
             {task.description}
           </p>
         )}
 
-        {task.dueDate && (
-          <p className="text-xs text-base-content/40 mt-auto">{task.dueDate}</p>
-        )}
+        <div className="flex items-center justify-between mt-auto">
+          {task.dueDate ? (
+            <span className="inline-flex items-center gap-1 text-xs border border-base-300 px-1.5 py-0.5 text-base-content/60">
+              <i className="fa-regular fa-calendar" style={{ fontSize: "10px" }} />
+              {formatDate(task.dueDate)}
+            </span>
+          ) : <span />}
+          <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center shrink-0">
+            <i className="fa-regular fa-user" style={{ fontSize: "10px" }} />
+          </div>
+        </div>
       </div>
 
       {open && <CardDetails task={task} onClose={() => setOpen(false)} />}

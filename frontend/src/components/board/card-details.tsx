@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAtomValue } from "jotai";
-import type { Task, Comment } from "../types";
-import { useTasks } from "../hooks/useTasks";
-import { teamAtom } from "../hooks/useTeam";
-import { sessionAtom } from "../hooks/useAuth";
+import type { Task, Comment } from "../../types";
+import { useTasks } from "../../hooks/useTasks";
+import { teamAtom } from "../../hooks/useTeam";
+import { sessionAtom } from "../../hooks/useAuth";
 import Tag from "./column/tag";
-import Dropdown from "./dropdown";
+import Dropdown from "../dropdown";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 

@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { tasksAtom } from "../hooks/useTasks";
+import { tasksAtom } from "../../hooks/useTasks";
 
 const COLUMNS = [
   { key: "todo",        label: "To Do",       color: "#DA4D3F" },

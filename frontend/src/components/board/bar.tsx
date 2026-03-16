@@ -1,6 +1,6 @@
 import { openNewTaskModal } from "./new-task-window";
-import Dropdown from "./dropdown";
-import type { TeamMember } from "../types";
+import Dropdown from "../dropdown";
+import type { TeamMember } from "../../types";
 
 type Props = {
   priority: string;

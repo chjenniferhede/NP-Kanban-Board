@@ -14,10 +14,10 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useAtom, useAtomValue } from "jotai";
-import type { Task } from "../types";
-import { tasksAtom, useTasks, fetchErrorCodeAtom } from "../hooks/useTasks";
-import { sessionAtom } from "../hooks/useAuth";
-import { teamAtom } from "../hooks/useTeam";
+import type { Task } from "../../types";
+import { tasksAtom, useTasks, fetchErrorCodeAtom } from "../../hooks/useTasks";
+import { sessionAtom } from "../../hooks/useAuth";
+import { teamAtom } from "../../hooks/useTeam";
 import Column from "./column/column";
 import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";

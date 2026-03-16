@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
-import { tasksAtom } from "../hooks/useTasks";
-import { teamAtom } from "../hooks/useTeam";
-import type { Task } from "../types";
+import { tasksAtom } from "../../hooks/useTasks";
+import { teamAtom } from "../../hooks/useTeam";
+import type { Task } from "../../types";
 
 const STATUS_COLOR: Record<Task["status"], string> = {
   todo:        "#DA4D3F",
@@ -33,7 +33,7 @@ export default function Workload() {
   const maxTasks = Math.max(...rows.map((r) => r.tasks.length));
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 p-3 rounded-md">
       {rows.map((row) => (
         <div key={row.id} className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
@@ -66,15 +66,6 @@ export default function Workload() {
         </div>
       ))}
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
-        {(Object.entries(STATUS_COLOR) as [Task["status"], string][]).map(([status, color]) => (
-          <div key={status} className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-sm shrink-0" style={{ backgroundColor: color }} />
-            <span className="text-[9px] text-base-content/40 capitalize">{status.replace("_", " ")}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

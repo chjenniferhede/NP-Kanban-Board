@@ -1,5 +1,5 @@
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import type { Task } from "../../types";
+import type { Task } from "../../../types";
 import TaskCard from "./task";
 
 type Props = {

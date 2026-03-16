@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useAtomValue } from "jotai";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Task } from "../../types";
-import { teamAtom } from "../../hooks/useTeam";
+import type { Task } from "../../../types";
+import { teamAtom } from "../../../hooks/useTeam";
 import Tag from "./tag";
 import CardDetails from "../card-details";
 

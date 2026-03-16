@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import type { Task } from "../types";
-import { useTasks } from "../hooks/useTasks";
-import Dropdown from "./dropdown";
+import type { Task } from "../../types";
+import { useTasks } from "../../hooks/useTasks";
+import Dropdown from "../dropdown";
 
 const MODAL_ID = "new-task-modal";
 

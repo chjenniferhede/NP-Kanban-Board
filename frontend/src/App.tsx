@@ -1,7 +1,7 @@
 import Header from "./components/header";
-import Sidebar from "./components/sidebar";
+import Sidebar from "./components/sidebar/sidebar";
 import Overview from "./components/overview";
-import Board from "./components/board";
+import Board from "./components/board/board";
 import { useAuth } from "./hooks/useAuth";
 
 export default function App() {

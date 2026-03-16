@@ -29,6 +29,22 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// PATCH /api/team/:id
+router.patch("/:id", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, initials, color } = req.body;
+    const [member] = await db
+      .update(teamMembers)
+      .set({ name, initials, color })
+      .where(and(eq(teamMembers.id, req.params.id), eq(teamMembers.userId, req.userId)))
+      .returning();
+    if (!member) return res.status(404).json({ error: "Member not found" });
+    res.json(member);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // DELETE /api/team/:id
 router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {

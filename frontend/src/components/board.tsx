@@ -17,6 +17,7 @@ import { useAtom, useAtomValue } from "jotai";
 import type { Task } from "../types";
 import { tasksAtom, useTasks, fetchErrorCodeAtom } from "../hooks/useTasks";
 import { sessionAtom } from "../hooks/useAuth";
+import { teamAtom } from "../hooks/useTeam";
 import Column from "./column/column";
 import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";
@@ -61,6 +62,7 @@ export default function Board() {
   const [filterAssignee, setFilterAssignee] = useState("");
   const [filterLabel, setFilterLabel]       = useState("");
 
+  const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
   useEffect(() => { if (session) fetchTasks(); }, [session?.userId]);
 
@@ -87,6 +89,10 @@ export default function Board() {
       if (isOverColumn) {
         const dragged = prev[activeIndex];
         if (dragged.status === overId) return prev;
+        // Only move here when the target column is empty; otherwise let
+        // card-to-card collision handle positioning to avoid jumping to end.
+        const columnHasTasks = prev.some((t) => t.id !== activeId && t.status === overId);
+        if (columnHasTasks) return prev;
         const without = prev.filter((t) => t.id !== activeId);
         return [...without, { ...dragged, status: overId as Task["status"] }];
       }
@@ -132,6 +138,7 @@ export default function Board() {
           priority={filterPriority}
           assignee={filterAssignee}
           label={filterLabel}
+          team={team}
           onPriorityChange={setFilterPriority}
           onAssigneeChange={setFilterAssignee}
           onLabelChange={setFilterLabel}
@@ -159,6 +166,7 @@ export default function Board() {
         priority={filterPriority}
         assignee={filterAssignee}
         label={filterLabel}
+        team={team}
         onPriorityChange={setFilterPriority}
         onAssigneeChange={setFilterAssignee}
         onLabelChange={setFilterLabel}

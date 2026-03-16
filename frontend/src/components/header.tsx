@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMe } from "../hooks/useMe";
+import { useTeam } from "../hooks/useTeam";
 
 const COLORS = [
   { label: "Indigo", value: "bg-indigo-400" },
@@ -15,6 +16,7 @@ const MODAL_ID = "me-profile-modal";
 
 export default function Header() {
   const { me, updateMe } = useMe();
+  const { updateMember } = useTeam();
   const [draftName, setDraftName]   = useState("");
   const [draftColor, setDraftColor] = useState("");
 
@@ -30,7 +32,10 @@ export default function Header() {
 
   function save() {
     if (!draftName.trim()) return;
-    updateMe({ name: draftName.trim(), initials: getInitials(draftName), color: draftColor });
+    const fields = { name: draftName.trim(), initials: getInitials(draftName), color: draftColor };
+    updateMe(fields);
+    const meMemberId = localStorage.getItem("me-member-id");
+    if (meMemberId && meMemberId !== "pending") updateMember(meMemberId, fields);
     (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
   }
 

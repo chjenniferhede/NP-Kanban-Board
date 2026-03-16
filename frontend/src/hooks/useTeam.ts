@@ -36,6 +36,17 @@ export function useTeam() {
     return member;
   }
 
+  async function updateMember(id: string, fields: Pick<TeamMember, "name" | "initials" | "color">) {
+    const res = await fetch(`${API}/api/team/${id}`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(fields),
+    });
+    if (!res.ok) throw new Error("Failed to update team member");
+    const member: TeamMember = await res.json();
+    setTeam((prev) => prev.map((m) => m.id === id ? member : m));
+  }
+
   async function deleteMember(id: string) {
     const res = await fetch(`${API}/api/team/${id}`, {
       method: "DELETE",
@@ -45,5 +56,5 @@ export function useTeam() {
     setTeam((prev) => prev.filter((m) => m.id !== id));
   }
 
-  return { team, fetchTeam, createMember, deleteMember };
+  return { team, fetchTeam, createMember, updateMember, deleteMember };
 }

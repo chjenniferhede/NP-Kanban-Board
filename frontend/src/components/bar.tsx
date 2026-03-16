@@ -1,16 +1,23 @@
 import { openNewTaskModal } from "./new-task-window";
 import Dropdown from "./dropdown";
+import type { TeamMember } from "../types";
 
 type Props = {
   priority: string;
   assignee: string;
   label: string;
+  team: TeamMember[];
   onPriorityChange: (v: string) => void;
   onAssigneeChange: (v: string) => void;
   onLabelChange: (v: string) => void;
 };
 
-export default function Bar({ priority, assignee, label, onPriorityChange, onAssigneeChange, onLabelChange }: Props) {
+export default function Bar({ priority, assignee, label, team, onPriorityChange, onAssigneeChange, onLabelChange }: Props) {
+  const assigneeOptions = [
+    { value: "", label: "All assignee" },
+    ...team.map((m) => ({ value: m.id, label: m.name, initials: m.initials, color: m.color })),
+  ];
+
   return (
     <div className="flex items-center justify-between mb-4 py-2">
       <div className="flex items-center gap-2">
@@ -33,7 +40,7 @@ export default function Bar({ priority, assignee, label, onPriorityChange, onAss
           onChange={onAssigneeChange}
           buttonClassName="btn btn-ghost border-gray-300 btn-md border border-base-300 min-w-36 font-normal"
           menuClassName="w-full"
-          options={[{ value: "", label: "All assignee" }]}
+          options={assigneeOptions}
         />
         <Dropdown
           label="All label"

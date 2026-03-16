@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { openNewTaskModal } from "./new-task-window";
 
 type Props = {
@@ -17,9 +18,21 @@ type DropdownProps = {
 };
 
 function FilterDropdown({ label, options, value, onChange }: DropdownProps) {
+  const ref = useRef<HTMLDetailsElement>(null);
   const selected = options.find((o) => o.value === value)?.label ?? label;
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        ref.current.removeAttribute("open");
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   return (
-    <details className="dropdown">
+    <details ref={ref} className="dropdown">
       <summary className="btn btn-ghost btn-md border border-base-300 min-w-36 justify-between gap-2 font-normal">
         {selected}
         <svg className="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">

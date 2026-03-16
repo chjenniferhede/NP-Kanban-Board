@@ -167,7 +167,7 @@ export default function Board() {
       {loading ? (
         <div className="flex gap-4 flex-1 overflow-y-hidden pb-4 relative overflow-hidden">
           {COLUMNS.map(({ key, accent }) => (
-            <div key={key} className="bg-base-200 rounded-xl flex-1 flex flex-col overflow-hidden">
+            <div key={key} className="bg-base-200 rounded-md flex-1 flex flex-col overflow-hidden">
               <div className={`${accent} h-1 w-full rounded-t-xl`} />
             </div>
           ))}

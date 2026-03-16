@@ -14,7 +14,6 @@ import {
   type DragOverEvent,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import type { Task } from "../types";
 import Column from "./column/column";
 import TaskCard from "./column/task";
@@ -71,17 +70,20 @@ export default function Board() {
     const overId   = over.id as string;
     if (activeId === overId) return;
 
-    const dragged = tasks.find((t) => t.id === activeId)!;
-    const overColumn = COLUMNS.find((c) => c.key === overId);
+    // Only handle cross-column status change here — append to end of target column.
+    // onDragEnd handles the final precise insertion position.
+    const targetColumn = COLUMNS.find((c) => c.key === overId);
+    const overTaskStatus = !targetColumn
+      ? tasks.find((t) => t.id === overId)?.status
+      : undefined;
+    const targetStatus = targetColumn?.key ?? overTaskStatus;
+    if (!targetStatus) return;
 
-    if (overColumn && dragged.status !== overColumn.key) {
-      setTasks((prev) => prev.map((t) => (t.id === activeId ? { ...t, status: overColumn.key } : t)));
-    } else {
-      const overTask = tasks.find((t) => t.id === overId);
-      if (overTask && dragged.status !== overTask.status) {
-        setTasks((prev) => prev.map((t) => (t.id === activeId ? { ...t, status: overTask.status } : t)));
-      }
-    }
+    setTasks((prev) => {
+      const dragged = prev.find((t) => t.id === activeId);
+      if (!dragged || dragged.status === targetStatus) return prev;
+      return [...prev.filter((t) => t.id !== activeId), { ...dragged, status: targetStatus as Task["status"] }];
+    });
   }
 
   function onDragEnd({ active, over }: DragEndEvent) {
@@ -89,12 +91,28 @@ export default function Board() {
     if (!over) return;
     const activeId = active.id as string;
     const overId   = over.id as string;
+
+    // Dropped on a column's empty area — already at end from onDragOver, done
+    if (COLUMNS.some((c) => c.key === overId)) return;
     if (activeId === overId) return;
+
+    // Dropped onto a task — do precise above/below insertion
     setTasks((prev) => {
-      const oldIndex = prev.findIndex((t) => t.id === activeId);
-      const newIndex = prev.findIndex((t) => t.id === overId);
-      if (oldIndex !== -1 && newIndex !== -1) return arrayMove(prev, oldIndex, newIndex);
-      return prev;
+      const dragged = prev.find((t) => t.id === activeId);
+      if (!dragged) return prev;
+
+      const draggedRect = active.rect.current.translated;
+      const insertAfter =
+        draggedRect != null &&
+        draggedRect.top + draggedRect.height / 2 > over.rect.top + over.rect.height / 2;
+
+      const without  = prev.filter((t) => t.id !== activeId);
+      const overIdx  = without.findIndex((t) => t.id === overId);
+      if (overIdx === -1) return prev;
+
+      const insertAt = insertAfter ? overIdx + 1 : overIdx;
+      without.splice(insertAt, 0, dragged);
+      return without;
     });
   }
 

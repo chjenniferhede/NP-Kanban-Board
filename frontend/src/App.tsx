@@ -2,8 +2,10 @@ import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 import Overview from "./components/overview";
 import Board from "./components/board";
+import { useAuth } from "./hooks/useAuth";
 
 export default function App() {
+  useAuth();
   return (
     <div className="flex flex-col h-screen bg-base-100">
       <Header />

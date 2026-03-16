@@ -1,9 +1,6 @@
 import { useState } from "react";
 import type { Task } from "../types";
-
-type Props = {
-  onAdd: (task: Task) => void;
-};
+import { useTasks } from "../hooks/useTasks";
 
 const MODAL_ID = "new-task-modal";
 
@@ -11,7 +8,8 @@ export function openNewTaskModal() {
   (document.getElementById(MODAL_ID) as HTMLDialogElement).showModal();
 }
 
-export default function NewTaskWindow({ onAdd }: Props) {
+export default function NewTaskWindow() {
+  const { createTask } = useTasks();
   const [title, setTitle]             = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority]       = useState<Task["priority"]>(undefined);
@@ -24,14 +22,10 @@ export default function NewTaskWindow({ onAdd }: Props) {
     setDueDate("");
   }
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!title.trim()) return;
-    onAdd({
-      id: crypto.randomUUID(),
+    await createTask({
       title: title.trim(),
-      status: "todo",
-      userId: "guest",
-      createdAt: new Date().toISOString().slice(0, 10),
       description: description.trim() || undefined,
       priority: priority || undefined,
       dueDate: dueDate || undefined,

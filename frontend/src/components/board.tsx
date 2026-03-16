@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -6,14 +6,16 @@ import {
   useSensor,
   useSensors,
   pointerWithin,
-  rectIntersection,
   closestCenter,
-  getFirstCollision,
   type CollisionDetection,
   type DragStartEvent,
   type DragOverEvent,
+  type DragEndEvent,
 } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
+import { useAtom } from "jotai";
 import type { Task } from "../types";
+import { tasksAtom, useTasks } from "../hooks/useTasks";
 import Column from "./column/column";
 import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";
@@ -26,34 +28,37 @@ const COLUMNS = [
   { key: "done",        label: "Done",        accent: "bg-green-400" },
 ] as const;
 
-const initialTasks: Task[] = [
-  { id: "1", title: "Set up project",   status: "done",        userId: "u1", createdAt: "2026-03-01", priority: "high" },
-  { id: "2", title: "Design schema",    status: "done",        userId: "u1", createdAt: "2026-03-02", priority: "normal" },
-  { id: "3", title: "Build API routes", status: "in_progress", userId: "u1", createdAt: "2026-03-10", priority: "high", description: "CRUD for tasks" },
-  { id: "4", title: "Connect frontend", status: "in_progress", userId: "u1", createdAt: "2026-03-11", priority: "normal" },
-  { id: "5", title: "Write validators", status: "in_review",   userId: "u1", createdAt: "2026-03-12", priority: "low" },
-  { id: "6", title: "Build kanban UI",  status: "todo",        userId: "u1", createdAt: "2026-03-13", dueDate: "2026-03-20", priority: "high" },
-  { id: "7", title: "Add auth",         status: "todo",        userId: "u1", createdAt: "2026-03-14", priority: "normal" },
-];
-
-// Prefer pointer-within so empty columns are always reachable.
-// Falls back to rectIntersection, then closestCenter for edge cases.
 const collisionDetection: CollisionDetection = (args) => {
-  const pointer = pointerWithin(args);
-  if (pointer.length > 0) return pointer;
-  const rect = rectIntersection(args);
-  if (rect.length > 0) return rect;
-  return getFirstCollision(closestCenter(args)) ? closestCenter(args) : [];
+  const columnHit = pointerWithin(args).find((h) => COLUMNS.some((c) => c.key === h.id));
+  if (!columnHit) return [];
+
+  const columnRect = args.droppableContainers.find((c) => c.id === columnHit.id)?.rect.current;
+  if (!columnRect) return [columnHit];
+
+  const cardsInColumn = args.droppableContainers.filter((c) => {
+    if (COLUMNS.some((col) => col.key === c.id)) return false;
+    const rect = c.rect.current;
+    if (!rect) return false;
+    const cx = rect.left + rect.width / 2;
+    return cx >= columnRect.left && cx <= columnRect.right;
+  });
+
+  if (cardsInColumn.length === 0) return [columnHit];
+
+  const taskHit = closestCenter({ ...args, droppableContainers: cardsInColumn })[0];
+  return taskHit ? [taskHit] : [columnHit];
 };
 
 export default function Board() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useAtom(tasksAtom);
+  const { fetchTasks, updateTask } = useTasks();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  // Filter state — no-op visually for now, ready for wiring
   const [filterPriority, setFilterPriority] = useState("");
   const [filterAssignee, setFilterAssignee] = useState("");
   const [filterLabel, setFilterLabel]       = useState("");
+
+  useEffect(() => { fetchTasks(); }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -69,37 +74,50 @@ export default function Board() {
     const overId   = over.id as string;
     if (activeId === overId) return;
 
-    const isOverColumn = COLUMNS.some((c) => c.key === overId);
-
     setTasks((prev) => {
-      const dragged = prev.find((t) => t.id === activeId);
-      if (!dragged) return prev;
+      const activeIndex = prev.findIndex((t) => t.id === activeId);
+      if (activeIndex === -1) return prev;
+
+      const isOverColumn = COLUMNS.some((c) => c.key === overId);
 
       if (isOverColumn) {
-        // Hovering column's empty area — append to end of that column
+        const dragged = prev[activeIndex];
         if (dragged.status === overId) return prev;
-        return [...prev.filter((t) => t.id !== activeId), { ...dragged, status: overId as Task["status"] }];
+        const without = prev.filter((t) => t.id !== activeId);
+        return [...without, { ...dragged, status: overId as Task["status"] }];
       }
 
-      // Hovering over a task — reorder based on dragged card center vs target card center
-      const overTask = prev.find((t) => t.id === overId);
-      if (!overTask) return prev;
+      const overIndex = prev.findIndex((t) => t.id === overId);
+      if (overIndex === -1) return prev;
 
-      const draggedRect   = active.rect.current.translated;
-      if (!draggedRect) return prev;
+      const activeTask = prev[activeIndex];
+      const overTask   = prev[overIndex];
 
-      const draggedCenter = draggedRect.top + draggedRect.height / 2;
-      const overCenter    = over.rect.top + over.rect.height / 2;
-      const insertAfter   = draggedCenter > overCenter;
+      if (activeTask.status !== overTask.status) {
+        // Cross-column: arrayMove gives wrong results because the active card's
+        // flat-array index may be on either side of overIndex depending on column order.
+        // Instead, remove and splice explicitly based on overlay center vs target center.
+        const overlayRect = active.rect.current.translated;
+        const insertAfter = overlayRect
+          ? overlayRect.top + overlayRect.height / 2 > over.rect.top + over.rect.height / 2
+          : false;
+        const without = prev.filter((t) => t.id !== activeId);
+        const idx = without.findIndex((t) => t.id === overId);
+        without.splice(insertAfter ? idx + 1 : idx, 0, { ...activeTask, status: overTask.status });
+        return without;
+      }
 
-      const without  = prev.filter((t) => t.id !== activeId);
-      const newIndex = without.findIndex((t) => t.id === overId);
-      without.splice(insertAfter ? newIndex + 1 : newIndex, 0, { ...dragged, status: overTask.status });
-      return without;
+      return arrayMove(prev, activeIndex, overIndex);
     });
   }
 
-  function onDragEnd() {
+  function onDragEnd({ active }: DragEndEvent) {
+    if (activeTask) {
+      const current = tasks.find((t) => t.id === active.id);
+      if (current && current.status !== activeTask.status) {
+        updateTask(active.id as string, { status: current.status });
+      }
+    }
     setActiveTask(null);
   }
 
@@ -142,7 +160,7 @@ export default function Board() {
         </DragOverlay>
       </DndContext>
 
-      <NewTaskWindow onAdd={(task) => setTasks((prev) => [...prev, task])} />
+      <NewTaskWindow />
     </div>
   );
 }

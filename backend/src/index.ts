@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import taskRouter from "./routes/task.js";
+import { requireAuth } from "./middleware/auth.js";
 
 // Load environment variables from .env
 dotenv.config();
@@ -21,7 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 // --- Routes ---
-app.use("/api/tasks", taskRouter); // Task CRUD
+app.use("/api/tasks", requireAuth, taskRouter);
 
 // Health check
 app.get("/health", (_req: Request, res: Response) => {

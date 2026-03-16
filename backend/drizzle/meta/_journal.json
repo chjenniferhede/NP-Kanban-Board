@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1773657846177,
+      "tag": "0000_massive_menace",
+      "breakpoints": true
+    }
+  ]
+}

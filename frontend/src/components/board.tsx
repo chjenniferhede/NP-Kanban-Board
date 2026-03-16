@@ -12,7 +12,6 @@ import {
   type CollisionDetection,
   type DragStartEvent,
   type DragOverEvent,
-  type DragEndEvent,
 } from "@dnd-kit/core";
 import type { Task } from "../types";
 import Column from "./column/column";
@@ -70,50 +69,38 @@ export default function Board() {
     const overId   = over.id as string;
     if (activeId === overId) return;
 
-    // Only handle cross-column status change here — append to end of target column.
-    // onDragEnd handles the final precise insertion position.
-    const targetColumn = COLUMNS.find((c) => c.key === overId);
-    const overTaskStatus = !targetColumn
-      ? tasks.find((t) => t.id === overId)?.status
-      : undefined;
-    const targetStatus = targetColumn?.key ?? overTaskStatus;
-    if (!targetStatus) return;
+    const isOverColumn = COLUMNS.some((c) => c.key === overId);
 
-    setTasks((prev) => {
-      const dragged = prev.find((t) => t.id === activeId);
-      if (!dragged || dragged.status === targetStatus) return prev;
-      return [...prev.filter((t) => t.id !== activeId), { ...dragged, status: targetStatus as Task["status"] }];
-    });
-  }
-
-  function onDragEnd({ active, over }: DragEndEvent) {
-    setActiveTask(null);
-    if (!over) return;
-    const activeId = active.id as string;
-    const overId   = over.id as string;
-
-    // Dropped on a column's empty area — already at end from onDragOver, done
-    if (COLUMNS.some((c) => c.key === overId)) return;
-    if (activeId === overId) return;
-
-    // Dropped onto a task — do precise above/below insertion
     setTasks((prev) => {
       const dragged = prev.find((t) => t.id === activeId);
       if (!dragged) return prev;
 
-      const draggedRect = active.rect.current.translated;
-      const insertAfter =
-        draggedRect != null &&
-        draggedRect.top + draggedRect.height / 2 > over.rect.top + over.rect.height / 2;
+      if (isOverColumn) {
+        // Hovering column's empty area — append to end of that column
+        if (dragged.status === overId) return prev;
+        return [...prev.filter((t) => t.id !== activeId), { ...dragged, status: overId as Task["status"] }];
+      }
+
+      // Hovering over a task — reorder based on dragged card center vs target card center
+      const overTask = prev.find((t) => t.id === overId);
+      if (!overTask) return prev;
+
+      const draggedRect   = active.rect.current.translated;
+      if (!draggedRect) return prev;
+
+      const draggedCenter = draggedRect.top + draggedRect.height / 2;
+      const overCenter    = over.rect.top + over.rect.height / 2;
+      const insertAfter   = draggedCenter > overCenter;
 
       const without  = prev.filter((t) => t.id !== activeId);
-      const overIdx  = without.findIndex((t) => t.id === overId);
-      if (overIdx === -1) return prev;
-
-      const insertAt = insertAfter ? overIdx + 1 : overIdx;
-      without.splice(insertAt, 0, dragged);
+      const newIndex = without.findIndex((t) => t.id === overId);
+      without.splice(insertAfter ? newIndex + 1 : newIndex, 0, { ...dragged, status: overTask.status });
       return without;
     });
+  }
+
+  function onDragEnd() {
+    setActiveTask(null);
   }
 
   return (

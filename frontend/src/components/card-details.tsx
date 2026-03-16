@@ -1,9 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import type { Task } from "../types";
+import { useAtomValue } from "jotai";
+import type { Task, Comment } from "../types";
 import { useTasks } from "../hooks/useTasks";
+import { teamAtom } from "../hooks/useTeam";
+import { sessionAtom } from "../hooks/useAuth";
 import Tag from "./column/tag";
 import Dropdown from "./dropdown";
+
+const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 type Props = {
   task: Task;
@@ -16,8 +21,6 @@ const PRIORITY_CONFIG = {
   low:    { label: "Low",    cls: "bg-base-200 text-base-content/50" },
 } as const;
 
-
-type Comment = { id: number; text: string; createdAt: Date };
 
 function EditableText({
   value,
@@ -81,20 +84,52 @@ function EditableText({
 
 export default function CardDetails({ task, onClose }: Props) {
   const { updateTask } = useTasks();
+  const team = useAtomValue(teamAtom);
+  const session = useAtomValue(sessionAtom);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentDraft, setCommentDraft] = useState("");
+  const [submittingComment, setSubmittingComment] = useState(false);
+
+  function authHeaders(): HeadersInit {
+    return {
+      "Content-Type": "application/json",
+      ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
+    };
+  }
+
+  useEffect(() => {
+    fetch(`${API}/api/tasks/${task.id}/comments`, { headers: authHeaders() })
+      .then((r) => r.ok ? r.json() : [])
+      .then((data: Comment[]) => setComments(data));
+  }, [task.id]);
 
   async function patch(fields: Partial<Task>) {
     await updateTask(task.id, fields);
   }
 
-  function submitComment() {
+  async function submitComment() {
     if (!commentDraft.trim()) return;
-    setComments((prev) => [
-      ...prev,
-      { id: Date.now(), text: commentDraft.trim(), createdAt: new Date() },
-    ]);
-    setCommentDraft("");
+    setSubmittingComment(true);
+    try {
+      const res = await fetch(`${API}/api/tasks/${task.id}/comments`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ text: commentDraft.trim() }),
+      });
+      if (res.ok) {
+        const comment: Comment = await res.json();
+        setComments((prev) => [...prev, comment]);
+        setCommentDraft("");
+      }
+    } finally {
+      setSubmittingComment(false);
+    }
+  }
+
+  function toggleAssignee(memberId: string) {
+    const ids = task.assigneeIds ?? [];
+    const next = ids.includes(memberId) ? ids.filter((id) => id !== memberId) : [...ids, memberId];
+    patch({ assigneeIds: next });
   }
 
   const p = task.priority ? PRIORITY_CONFIG[task.priority] : null;
@@ -166,7 +201,7 @@ export default function CardDetails({ task, onClose }: Props) {
                     <div>
                       <p className="text-sm">{c.text}</p>
                       <p className="text-xs text-base-content/30 mt-0.5">
-                        {c.createdAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        {new Date(c.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
@@ -181,8 +216,10 @@ export default function CardDetails({ task, onClose }: Props) {
                   onChange={(e) => setCommentDraft(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submitComment()}
                 />
-                <button className="btn btn-primary btn-sm" onClick={submitComment}>
-                  <i className="fa-solid fa-paper-plane" />
+                <button className="btn btn-primary btn-sm" onClick={submitComment} disabled={submittingComment}>
+                  {submittingComment
+                    ? <span className="loading loading-spinner loading-xs" />
+                    : <i className="fa-solid fa-paper-plane" />}
                 </button>
               </div>
             </div>
@@ -244,7 +281,29 @@ export default function CardDetails({ task, onClose }: Props) {
 
             {/* Assignee */}
             <DetailRow icon="fa-user" label="Assignee">
-              <span className="text-xs text-base-content/30">Unassigned</span>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="tooltip tooltip-bottom" data-tip="Unassigned">
+                  <button
+                    onClick={() => patch({ assigneeIds: [] })}
+                    className={`w-7 h-7 rounded-full bg-base-200 flex items-center justify-center transition-all ${!task.assigneeIds?.length ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                  >
+                    <i className="fa-regular fa-user text-base-content/50" style={{ fontSize: "11px" }} />
+                  </button>
+                </div>
+                {team.map((m) => {
+                  const selected = task.assigneeIds?.includes(m.id);
+                  return (
+                    <div key={m.id} className="tooltip tooltip-bottom" data-tip={m.name}>
+                      <button
+                        onClick={() => toggleAssignee(m.id)}
+                        className={`${m.color} w-7 h-7 rounded-full text-white text-[9px] font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                      >
+                        {m.initials}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </DetailRow>
           </div>
 

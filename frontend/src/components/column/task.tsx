@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useAtomValue } from "jotai";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../types";
+import { teamAtom } from "../../hooks/useTeam";
 import Tag from "./tag";
 import CardDetails from "../card-details";
 
@@ -27,6 +29,8 @@ export default function TaskCard({ task }: Props) {
   };
 
   const p = task.priority ? priorityConfig[task.priority] : null;
+  const team = useAtomValue(teamAtom);
+  const assignees = team.filter((m) => task.assigneeIds?.includes(m.id));
 
   function formatDate(d: string) {
     const [y, m, day] = d.split("-").map(Number);
@@ -65,8 +69,22 @@ export default function TaskCard({ task }: Props) {
               {formatDate(task.dueDate)}
             </span>
           ) : <span />}
-          <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center shrink-0">
-            <i className="fa-regular fa-user" style={{ fontSize: "10px" }} />
+          <div className="flex -space-x-1">
+            {/* if no assignees, show single "Unassigned" avatar */}
+            {assignees.length === 0 ? (
+              <div className="tooltip tooltip-left [&::before]:text-[10px]" data-tip="Unassigned">
+                <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
+                  <i className="fa-regular fa-user text-base-content/40" style={{ fontSize: "10px" }} />
+                </div>
+            {/* map assignees to their avatars otherwise */}
+              </div>
+            ) : assignees.map((m) => (
+              <div key={m.id} className="tooltip tooltip-left [&::before]:text-[10px]" data-tip={m.name}>
+                <div className={`${m.color} w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-semibold ring-1 ring-base-100`}>
+                  {m.initials}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

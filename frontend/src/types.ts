@@ -8,5 +8,22 @@ export type Task = {
   description?: string;
   priority?: "low" | "normal" | "high";
   dueDate?: string;
-  assigneeId?: string;
+  assigneeIds?: string[];
+};
+
+export type TeamMember = {
+  id: string;
+  userId: string;
+  name: string;
+  initials: string;
+  color: string;
+  createdAt: string;
+};
+
+export type Comment = {
+  id: string;
+  taskId: string;
+  userId: string;
+  text: string;
+  createdAt: string;
 };

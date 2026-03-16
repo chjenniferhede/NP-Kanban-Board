@@ -32,10 +32,10 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 // POST /api/tasks
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, status, description, priority, dueDate, assigneeId } = req.body;
+    const { title, status, description, priority, dueDate, assigneeIds } = req.body;
     const [task] = await db
       .insert(tasks)
-      .values({ title, status, userId: req.userId, description, priority, dueDate, assigneeId })
+      .values({ title, status, userId: req.userId, description, priority, dueDate, assigneeIds })
       .returning();
     res.status(201).json(task);
   } catch (err) {
@@ -46,10 +46,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 // PATCH /api/tasks/:id
 router.patch("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, status, description, priority, dueDate, assigneeId } = req.body;
+    const { title, status, description, priority, dueDate, assigneeIds } = req.body;
     const [task] = await db
       .update(tasks)
-      .set({ title, status, description, priority, dueDate, assigneeId })
+      .set({ title, status, description, priority, dueDate, assigneeIds })
       .where(and(eq(tasks.id, req.params.id), eq(tasks.userId, req.userId)))
       .returning();
     if (!task) return res.status(404).json({ error: "Task not found" });

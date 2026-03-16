@@ -1,11 +1,7 @@
-import { useState } from "react";
-
-type TeamMember = {
-  id: string;
-  name: string;
-  initials: string;
-  color: string;
-};
+import { useState, useEffect } from "react";
+import { useAtomValue } from "jotai";
+import { useTeam } from "../hooks/useTeam";
+import { sessionAtom } from "../hooks/useAuth";
 
 const COLORS = [
   { label: "Purple", value: "bg-purple-400" },
@@ -16,68 +12,68 @@ const COLORS = [
   { label: "Teal",   value: "bg-teal-400" },
 ];
 
-const initialTeam: TeamMember[] = [
-  { id: "1", name: "Alex Rivera", initials: "AR", color: "bg-purple-400" },
-  { id: "2", name: "Sam Chen",    initials: "SC", color: "bg-blue-400" },
-  { id: "3", name: "Jordan Lee",  initials: "JL", color: "bg-teal-400" },
-];
-
-type Props = {
-  title: string;
-};
+type Props = { title: string };
 
 export default function Overview({ title }: Props) {
-  const [team, setTeam] = useState<TeamMember[]>(initialTeam);
-  const [name, setName] = useState("");
+  const { team, fetchTeam, createMember } = useTeam();
+  const session = useAtomValue(sessionAtom);
+  const [name, setName]   = useState("");
   const [color, setColor] = useState(COLORS[0].value);
+  const [adding, setAdding] = useState(false);
+
+  useEffect(() => { if (session) fetchTeam(); }, [session?.userId]);
 
   function getInitials(fullName: string) {
     return fullName.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
   }
 
-  function addTeammate() {
+  async function addTeammate() {
     if (!name.trim()) return;
-    setTeam([...team, { id: crypto.randomUUID(), name: name.trim(), initials: getInitials(name), color }]);
-    setName("");
-    setColor(COLORS[0].value);
-    (document.getElementById("add-teammate-modal") as HTMLDialogElement).close();
+    setAdding(true);
+    try {
+      await createMember({ name: name.trim(), initials: getInitials(name), color });
+      setName("");
+      setColor(COLORS[0].value);
+      (document.getElementById("add-teammate-modal") as HTMLDialogElement).close();
+    } finally {
+      setAdding(false);
+    }
   }
 
   return (
     <div className="flex items-center justify-between mb-6">
-      {/* Board title */}
       <h1 className="text-2xl font-bold">{title}</h1>
 
-      {/* Right side: team + new task button */}
-      <div className="flex items-center gap-4">
-
-        {/* Team section */}
-        <div className="flex items-center gap-3">
-          <div className="flex -space-x-2">
-            {team.map((member) => (
-              <div key={member.id} className="tooltip tooltip-left" data-tip={member.name}>
-                <div className={`${member.color} text-white rounded-full w-9 h-9 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100`}>
-                  {member.initials}
-                </div>
-              </div>
-            ))}
+      <div className="flex items-center gap-3">
+        <div className="flex -space-x-2">
+          {/* Unassigned — always present */}
+          <div className="tooltip tooltip-left" data-tip="Unassigned">
+            <div className="bg-base-200 rounded-full w-9 h-9 flex items-center justify-center ring-2 ring-base-100">
+              <i className="fa-regular fa-user text-base-content/40" style={{ fontSize: "14px" }} />
+            </div>
           </div>
-
-          <button
-            className="btn btn-sm btn-outline btn-circle"
-            title="Add teammate"
-            onClick={() => (document.getElementById("add-teammate-modal") as HTMLDialogElement).showModal()}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z" />
-            </svg>
-          </button>
+          {team.map((member) => (
+            <div key={member.id} className="tooltip tooltip-left" data-tip={member.name}>
+              <div className={`${member.color} text-white rounded-full w-9 h-9 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100`}>
+                {member.initials}
+              </div>
+            </div>
+          ))}
         </div>
 
+        <button
+          className="btn btn-sm btn-outline btn-circle"
+          title="Add teammate"
+          onClick={() => (document.getElementById("add-teammate-modal") as HTMLDialogElement).showModal()}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z" />
+          </svg>
+        </button>
       </div>
 
       {/* Add teammate modal */}
-      <dialog id="add-teammate-modal" className="modal">
+      <dialog id="add-teammate-modal" className="modal backdrop:bg-black/60">
         <div className="modal-box flex flex-col gap-4">
           <h3 className="font-bold text-lg">Add teammate</h3>
 
@@ -90,6 +86,7 @@ export default function Overview({ title }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTeammate()}
+              autoFocus
             />
           </label>
 
@@ -120,14 +117,12 @@ export default function Overview({ title }: Props) {
             <button className="btn btn-ghost" onClick={() => (document.getElementById("add-teammate-modal") as HTMLDialogElement).close()}>
               Cancel
             </button>
-            <button className="btn btn-primary" onClick={addTeammate} disabled={!name.trim()}>
-              Add
+            <button className="btn btn-primary" onClick={addTeammate} disabled={!name.trim() || adding}>
+              {adding ? <span className="loading loading-spinner loading-xs" /> : "Add"}
             </button>
           </div>
         </div>
-        <form method="dialog" className="modal-backdrop">
-          <button>close</button>
-        </form>
+        <form method="dialog" className="modal-backdrop"><button>close</button></form>
       </dialog>
     </div>
   );

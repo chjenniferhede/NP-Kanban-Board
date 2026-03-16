@@ -31,6 +31,7 @@ import Sidebar from "./components/sidebar";
 import Overview from "./components/overview";
 import Column from "./components/column/column";
 import TaskCard from "./components/column/task";
+import NewTaskWindow from "./components/new-task-window";
 
 const COLUMNS = [
   { key: "todo",        label: "To Do",       accent: "bg-red-400" },
@@ -149,6 +150,8 @@ export default function App() {
           </DndContext>
         </main>
       </div>
+
+      <NewTaskWindow onAdd={(task) => setTasks((prev) => [...prev, task])} />
     </div>
   );
 }

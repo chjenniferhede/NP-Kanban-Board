@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { openNewTaskModal } from "./new-task-window";
 
 type TeamMember = {
   id: string;
   name: string;
   initials: string;
-  color: string; // Tailwind bg color class
+  color: string;
 };
 
 const COLORS = [
@@ -32,21 +33,12 @@ export default function Overview({ title }: Props) {
   const [color, setColor] = useState(COLORS[0].value);
 
   function getInitials(fullName: string) {
-    return fullName
-      .trim()
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return fullName.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
   }
 
   function addTeammate() {
     if (!name.trim()) return;
-    setTeam([
-      ...team,
-      { id: crypto.randomUUID(), name: name.trim(), initials: getInitials(name), color },
-    ]);
+    setTeam([...team, { id: crypto.randomUUID(), name: name.trim(), initials: getInitials(name), color }]);
     setName("");
     setColor(COLORS[0].value);
     (document.getElementById("add-teammate-modal") as HTMLDialogElement).close();
@@ -57,28 +49,35 @@ export default function Overview({ title }: Props) {
       {/* Board title */}
       <h1 className="text-2xl font-bold">{title}</h1>
 
-      {/* Team section */}
-      <div className="flex items-center gap-3">
-        {/* Stacked avatars */}
-        <div className="flex -space-x-2">
-          {team.map((member) => (
-            <div key={member.id} className="tooltip" data-tip={member.name}>
-              <div className={`${member.color} text-white rounded-full w-9 h-9 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100`}>
-                {member.initials}
+      {/* Right side: team + new task button */}
+      <div className="flex items-center gap-4">
+
+        {/* Team section */}
+        <div className="flex items-center gap-3">
+          <div className="flex -space-x-2">
+            {team.map((member) => (
+              <div key={member.id} className="tooltip" data-tip={member.name}>
+                <div className={`${member.color} text-white rounded-full w-9 h-9 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100`}>
+                  {member.initials}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <button
+            className="btn btn-sm btn-outline btn-circle"
+            title="Add teammate"
+            onClick={() => (document.getElementById("add-teammate-modal") as HTMLDialogElement).showModal()}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z" />
+            </svg>
+          </button>
         </div>
 
-        {/* Add teammate button */}
-        <button
-          className="btn btn-sm btn-outline btn-circle"
-          title="Add teammate"
-          onClick={() => (document.getElementById("add-teammate-modal") as HTMLDialogElement).showModal()}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z" />
-          </svg>
+        {/* New task button — w-72 matches column width */}
+        <button className="btn btn-primary w-72" onClick={openNewTaskModal}>
+          + New task
         </button>
       </div>
 
@@ -87,7 +86,6 @@ export default function Overview({ title }: Props) {
         <div className="modal-box flex flex-col gap-4">
           <h3 className="font-bold text-lg">Add teammate</h3>
 
-          {/* Name input */}
           <label className="form-control w-full">
             <span className="label-text mb-1">Name</span>
             <input
@@ -100,7 +98,6 @@ export default function Overview({ title }: Props) {
             />
           </label>
 
-          {/* Color picker */}
           <div className="flex flex-col gap-2">
             <span className="label-text">Icon color</span>
             <div className="flex gap-2">
@@ -115,7 +112,6 @@ export default function Overview({ title }: Props) {
             </div>
           </div>
 
-          {/* Preview */}
           {name.trim() && (
             <div className="flex items-center gap-3">
               <div className={`${color} text-white rounded-full w-9 h-9 flex items-center justify-center text-xs font-semibold`}>
@@ -134,8 +130,6 @@ export default function Overview({ title }: Props) {
             </button>
           </div>
         </div>
-
-        {/* Close on backdrop click */}
         <form method="dialog" className="modal-backdrop">
           <button>close</button>
         </form>

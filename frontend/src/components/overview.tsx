@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { openNewTaskModal } from "./new-task-window";
 
 type TeamMember = {
   id: string;
@@ -75,10 +74,6 @@ export default function Overview({ title }: Props) {
           </button>
         </div>
 
-        {/* New task button — w-72 matches column width */}
-        <button className="btn btn-primary w-72" onClick={openNewTaskModal}>
-          + New task
-        </button>
       </div>
 
       {/* Add teammate modal */}

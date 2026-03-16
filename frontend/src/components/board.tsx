@@ -65,7 +65,7 @@ export default function Board() {
   useEffect(() => { if (session) fetchTasks(); }, [session?.userId]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { delay: 112, tolerance: 5 } })
   );
 
   function onDragStart({ active }: DragStartEvent) {

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import { openNewTaskModal } from "./new-task-window";
+import Dropdown from "./dropdown";
 
 type Props = {
   priority: string;
@@ -10,62 +10,16 @@ type Props = {
   onLabelChange: (v: string) => void;
 };
 
-type DropdownProps = {
-  label: string;
-  options: { value: string; label: string }[];
-  value: string;
-  onChange: (v: string) => void;
-};
-
-function FilterDropdown({ label, options, value, onChange }: DropdownProps) {
-  const ref = useRef<HTMLDetailsElement>(null);
-  const selected = options.find((o) => o.value === value)?.label ?? label;
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        ref.current.removeAttribute("open");
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  return (
-    <details ref={ref} className="dropdown">
-      <summary className="btn btn-ghost btn-md border border-base-300 min-w-36 justify-between gap-2 font-normal">
-        {selected}
-        <svg className="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </summary>
-      <ul className="dropdown-content menu bg-base-100 rounded-box shadow-lg border border-base-200 z-10 w-full p-1">
-        {options.map((o) => (
-          <li key={o.value}>
-            <a
-              className={value === o.value ? "active" : ""}
-              onClick={() => {
-                onChange(o.value);
-                (document.activeElement as HTMLElement)?.closest("details")?.removeAttribute("open");
-              }}
-            >
-              {o.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </details>
-  );
-}
-
 export default function Bar({ priority, assignee, label, onPriorityChange, onAssigneeChange, onLabelChange }: Props) {
   return (
     <div className="flex items-center justify-between mb-4 py-2">
       <div className="flex items-center gap-2">
-        <FilterDropdown
+        <Dropdown
           label="All priority"
           value={priority}
           onChange={onPriorityChange}
+          buttonClassName="btn btn-ghost btn-md border border-base-300 min-w-36 font-normal"
+          menuClassName="w-full"
           options={[
             { value: "", label: "All priority" },
             { value: "low", label: "Low" },
@@ -73,16 +27,20 @@ export default function Bar({ priority, assignee, label, onPriorityChange, onAss
             { value: "high", label: "High" },
           ]}
         />
-        <FilterDropdown
+        <Dropdown
           label="All assignee"
           value={assignee}
           onChange={onAssigneeChange}
+          buttonClassName="btn btn-ghost btn-md border border-base-300 min-w-36 font-normal"
+          menuClassName="w-full"
           options={[{ value: "", label: "All assignee" }]}
         />
-        <FilterDropdown
+        <Dropdown
           label="All label"
           value={label}
           onChange={onLabelChange}
+          buttonClassName="btn btn-ghost btn-md border border-base-300 min-w-36 font-normal"
+          menuClassName="w-full"
           options={[{ value: "", label: "All label" }]}
         />
       </div>

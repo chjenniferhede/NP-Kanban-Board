@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <header className="navbar bg-base-100 border-b border-base-200 px-6 min-h-20">
+    <header className="navbar bg-base-100 border-b border-base-300 px-6 min-h-20">
       {/* Left — spacer */}
       <div className="flex-1" />
 

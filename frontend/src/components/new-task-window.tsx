@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { Task } from "../types";
 import { useTasks } from "../hooks/useTasks";
+import Dropdown from "./dropdown";
 
 const MODAL_ID = "new-task-modal";
 
@@ -60,8 +61,8 @@ export default function NewTaskWindow() {
       </div>,
       document.body
     )}
-    <dialog id={MODAL_ID} className="modal backdrop:backdrop-blur-sm">
-      <div className="modal-box flex flex-col gap-4">
+    <dialog id={MODAL_ID} className="modal backdrop:bg-black/60">
+      <div className="modal-box w-full max-w-2xl flex flex-col gap-7 pb-16">
         <h3 className="font-bold text-lg">New task</h3>
 
         {/* Title */}
@@ -91,19 +92,22 @@ export default function NewTaskWindow() {
         </fieldset>
 
         {/* Priority + Due date side by side */}
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <fieldset className="fieldset flex-1">
             <legend className="fieldset-legend">Priority</legend>
-            <select
-              className="select select-bordered w-full"
+            <Dropdown
+              label="None"
               value={priority ?? ""}
-              onChange={(e) => setPriority((e.target.value as Task["priority"]) || undefined)}
-            >
-              <option value="">None</option>
-              <option value="low">Low</option>
-              <option value="normal">Normal</option>
-              <option value="high">High</option>
-            </select>
+              onChange={(v) => setPriority((v as Task["priority"]) || undefined)}
+              buttonClassName="btn btn-ghost btn-md border border-base-300 w-full font-normal"
+              menuClassName="w-full"
+              options={[
+                { value: "",       label: "None" },
+                { value: "low",    label: "Low" },
+                { value: "normal", label: "Normal" },
+                { value: "high",   label: "High" },
+              ]}
+            />
           </fieldset>
 
           <fieldset className="fieldset flex-1">

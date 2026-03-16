@@ -55,7 +55,7 @@ export default function Overview({ title }: Props) {
         <div className="flex items-center gap-3">
           <div className="flex -space-x-2">
             {team.map((member) => (
-              <div key={member.id} className="tooltip" data-tip={member.name}>
+              <div key={member.id} className="tooltip tooltip-left" data-tip={member.name}>
                 <div className={`${member.color} text-white rounded-full w-9 h-9 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100`}>
                   {member.initials}
                 </div>

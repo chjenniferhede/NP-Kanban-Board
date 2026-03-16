@@ -5,11 +5,25 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  closestCorners,
+  pointerWithin,
+  rectIntersection,
+  closestCenter,
+  getFirstCollision,
+  type CollisionDetection,
   type DragStartEvent,
   type DragOverEvent,
   type DragEndEvent,
 } from "@dnd-kit/core";
+
+// Prefer pointer-within so empty columns are always reachable.
+// Falls back to rectIntersection, then closestCenter for edge cases.
+const collisionDetection: CollisionDetection = (args) => {
+  const pointer = pointerWithin(args);
+  if (pointer.length > 0) return pointer;
+  const rect = rectIntersection(args);
+  if (rect.length > 0) return rect;
+  return getFirstCollision(closestCenter(args)) ? closestCenter(args) : [];
+};
 import { arrayMove } from "@dnd-kit/sortable";
 import type { Task } from "./types";
 import Header from "./components/header";
@@ -59,7 +73,7 @@ export default function App() {
 
     const activeTask = tasks.find((t) => t.id === activeId)!;
     // Check if we're hovering over a column (droppable) vs another task
-    const overColumn = COLUMNS.find((c) => c.label === overId);
+    const overColumn = COLUMNS.find((c) => c.key === overId);
 
     if (overColumn && activeTask.status !== overColumn.key) {
       // Dropped directly onto a column — move task to that column
@@ -107,7 +121,7 @@ export default function App() {
           {/* Kanban board */}
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCorners}
+            collisionDetection={collisionDetection}
             onDragStart={onDragStart}
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
@@ -116,6 +130,7 @@ export default function App() {
               {COLUMNS.map(({ key, label, accent }) => (
                 <Column
                   key={key}
+                  columnKey={key}
                   title={label}
                   accent={accent}
                   tasks={tasks.filter((t) => t.status === key)}

@@ -4,7 +4,7 @@ import Tasks from "./tasks";
 type Props = {
   title: string;
   tasks: Task[];
-  accent: string; // Tailwind bg color class e.g. "bg-red-400"
+  accent: string;
 };
 
 export default function Column({ title, tasks, accent }: Props) {
@@ -20,8 +20,8 @@ export default function Column({ title, tasks, accent }: Props) {
           <span className="badge badge-ghost badge-sm">{tasks.length}</span>
         </div>
 
-        {/* Task list */}
-        <Tasks tasks={tasks} />
+        {/* Task list — columnId used as the droppable id */}
+        <Tasks columnId={title} tasks={tasks} />
       </div>
     </div>
   );

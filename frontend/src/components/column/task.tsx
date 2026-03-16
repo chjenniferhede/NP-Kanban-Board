@@ -1,3 +1,5 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../types";
 
 type Props = {
@@ -5,8 +7,23 @@ type Props = {
 };
 
 export default function TaskCard({ task }: Props) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
   return (
-    <div className="card bg-base-100 shadow-sm p-3 gap-1">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="card bg-base-100 shadow-sm p-3 gap-1 cursor-grab active:cursor-grabbing touch-none"
+    >
       <p className="font-medium text-sm">{task.title}</p>
 
       {task.description && (
@@ -16,7 +33,6 @@ export default function TaskCard({ task }: Props) {
       )}
 
       <div className="flex items-center justify-between mt-1">
-        {/* Priority badge */}
         {task.priority && (
           <span
             className={`badge badge-sm ${
@@ -30,8 +46,6 @@ export default function TaskCard({ task }: Props) {
             {task.priority}
           </span>
         )}
-
-        {/* Due date */}
         {task.dueDate && (
           <span className="text-xs text-base-content/50">{task.dueDate}</span>
         )}

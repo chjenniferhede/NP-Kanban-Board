@@ -5,8 +5,9 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../../types";
 import { teamAtom } from "../../../hooks/useTeam";
 import { useComments } from "../../../hooks/useComments";
-import { useTasks } from "../../../hooks/useTasks";
+import { useTasks, fetchErrorAtom } from "../../../hooks/useTasks";
 import { resolveAvatarColor } from "../../../lib/avatarColors";
+import { useToast } from "../../toast";
 import Tag from "./tag";
 import CardDetails from "../card-details";
 import DeleteConfirm from "./delete-confirm";
@@ -37,6 +38,8 @@ export default function TaskCard({ task }: Props) {
   const { getComments } = useComments();
   const commentCount = getComments(task.id).length;
   const { deleteTask } = useTasks();
+  const fetchError = useAtomValue(fetchErrorAtom);
+  const toast = useToast();
   const team = useAtomValue(teamAtom);
   const assignees = team.filter((m) => task.assigneeIds?.includes(m.id));
 
@@ -67,7 +70,8 @@ export default function TaskCard({ task }: Props) {
             )}
             <button
               onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
-              className="text-base-content/30 hover:text-error transition-colors"
+              className="text-base-content/30 hover:text-error transition-colors disabled:opacity-30 disabled:pointer-events-none"
+              disabled={!!fetchError}
             >
               <i className="fa-regular fa-trash-can text-[11px]" />
             </button>
@@ -110,7 +114,10 @@ export default function TaskCard({ task }: Props) {
       {open && <CardDetails task={task} onClose={() => setOpen(false)} />}
       {confirmDelete && (
         <DeleteConfirm
-          onConfirm={() => { setConfirmDelete(false); deleteTask(task.id); }}
+          onConfirm={() => {
+            setConfirmDelete(false);
+            deleteTask(task.id).catch(() => toast("Failed to delete task. Please try again.", "error"));
+          }}
           onCancel={() => setConfirmDelete(false)}
         />
       )}

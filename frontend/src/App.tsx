@@ -1,15 +1,22 @@
+import { useEffect } from "react";
+import { useAtomValue } from "jotai";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar/sidebar";
 import ProjectTitle from "./components/project-title";
 import Board from "./components/board/board";
 import Team from "./components/board/team";
-import { Toaster } from "./components/toast";
-import { useAuth } from "./hooks/useAuth";
+import { Toaster, useToast } from "./components/toast";
+import { useAuth, authErrorAtom } from "./hooks/useAuth";
 
 const DRAWER_ID = "sidebar-drawer";
 
 export default function App() {
   useAuth();
+  const authError = useAtomValue(authErrorAtom);
+  const toast = useToast();
+  useEffect(() => {
+    if (authError) toast("Authentication failed. Please refresh the page.", "error");
+  }, [authError]);
   return (
     <div className="flex flex-col h-screen bg-(--color-bg-app)">
       <Header />

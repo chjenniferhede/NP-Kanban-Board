@@ -5,20 +5,22 @@ import { supabase } from "../lib/supabase";
 type Session = { userId: string; token: string } | null;
 
 export const sessionAtom = atom<Session>(null);
+export const authErrorAtom = atom(false);
 
 export function useAuth() {
   const [session, setSession] = useAtom(sessionAtom);
+  const [, setAuthError] = useAtom(authErrorAtom);
 
   useEffect(() => {
     // Rehydrate existing session or sign in anonymously
-    supabase.auth.getSession().then(async ({ data }) => {
+    supabase.auth.getSession().then(async ({ data, error }) => {
+      if (error) { setAuthError(true); return; }
       if (data.session) {
         setSession({ userId: data.session.user.id, token: data.session.access_token });
       } else {
-        const { data: signInData } = await supabase.auth.signInAnonymously();
-        if (signInData.session) {
-          setSession({ userId: signInData.session.user.id, token: signInData.session.access_token });
-        }
+        const { data: signInData, error: signInError } = await supabase.auth.signInAnonymously();
+        if (signInError || !signInData.session) { setAuthError(true); return; }
+        setSession({ userId: signInData.session.user.id, token: signInData.session.access_token });
       }
     });
 

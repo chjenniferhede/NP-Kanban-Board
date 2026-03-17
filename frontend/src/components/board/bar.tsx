@@ -9,11 +9,13 @@ type Props = {
   team: TeamMember[];
   onPriorityChange: (v: string) => void;
   onAssigneeChange: (v: string) => void;
+  disabled?: boolean;
 };
 
-export default function Bar({ priority, assignee, team, onPriorityChange, onAssigneeChange }: Props) {
+export default function Bar({ priority, assignee, team, onPriorityChange, onAssigneeChange, disabled }: Props) {
   const assigneeOptions = [
     { value: "", label: "All assignee" },
+    { value: "__unassigned__", label: "Unassigned", initials: "–", color: "#E5E7EB" },
     ...team.map((m) => ({ value: m.id, label: m.name, initials: m.initials, color: resolveAvatarColor(m.color) })),
   ];
 
@@ -43,7 +45,7 @@ export default function Bar({ priority, assignee, team, onPriorityChange, onAssi
         />
       </div>
 
-      <button className="btn btn-action" onClick={openNewTaskModal}>
+      <button className="btn btn-action" onClick={openNewTaskModal} disabled={disabled}>
         + New task
       </button>
     </div>

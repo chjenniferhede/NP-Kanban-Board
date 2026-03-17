@@ -26,7 +26,7 @@ export default function Stats() {
     return (
       <div className="flex flex-col items-center gap-3">
         <svg viewBox="0 0 100 100" width="130" height="130">
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="var(--color-chart-empty)" strokeWidth="16" />
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#c7d2fe" strokeWidth="16" />
         </svg>
         <p className="text-xs text-base-content/30">No tasks yet</p>
       </div>

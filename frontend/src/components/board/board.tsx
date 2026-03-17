@@ -24,6 +24,7 @@ import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";
 import Bar from "./bar";
 import { useToast } from "../toast";
+import { useSeedData } from "../../hooks/useSeedData";
 
 
 const COLUMNS = [
@@ -63,6 +64,7 @@ export default function Board() {
     return () => window.removeEventListener("pointermove", handler);
   }, []);
   const { fetchTasks, updateTask, loading, fetchError } = useTasks();
+  useSeedData(loading, fetchTasks);
   const { fetchAllComments } = useComments();
   const fetchErrorCode = useAtomValue(fetchErrorCodeAtom);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
@@ -155,6 +157,7 @@ export default function Board() {
           team={team}
           onPriorityChange={setFilterPriority}
           onAssigneeChange={setFilterAssignee}
+          disabled
         />
         <div className="flex flex-col items-center justify-center flex-1 gap-3 text-center">
           <p className="text-5xl">⚠️</p>
@@ -183,62 +186,66 @@ export default function Board() {
         onAssigneeChange={setFilterAssignee}
       />
 
-      {loading ? (
-        <div className="flex gap-3 flex-1 min-h-0 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory relative overflow-hidden">
-          {COLUMNS.map(({ key, accent }) => (
-            <div key={key} className="lg:flex-1 lg:min-w-0 min-h-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
-              <div className="bg-(--color-bg-column) rounded-md h-full flex flex-col overflow-hidden">
-                <div className={`${accent} h-1 w-full rounded-t-xl`} />
-              </div>
-            </div>
-          ))}
-          {/* single shimmer sweep across all columns */}
-          <div
-            className="shimmer-sweep absolute inset-0 pointer-events-none w-1/4 bg-linear-to-r from-transparent via-white/70 to-transparent"
-          />
-        </div>
-      ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={collisionDetection}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
-        >
-          <div className="flex gap-3 flex-1 min-h-0 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
-            {COLUMNS.map(({ key, label, accent, icon }) => {
-              const columnTasks = tasks.filter((t) => t.status === key);
-              const q = search.trim().toLowerCase();
-              const displayed = columnTasks.filter((t) => {
-                if (filterPriority && t.priority !== filterPriority) return false;
-                if (filterAssignee && !t.assigneeIds?.includes(filterAssignee)) return false;
-                if (q && !`${t.title} ${t.description ?? ""}`.toLowerCase().includes(q)) return false;
-                return true;
-              });
-              return (
-                <div key={key} className="lg:flex-1 lg:min-w-0 min-h-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
-                  <Column
-                    columnKey={key}
-                    title={label}
-                    accent={accent}
-                    icon={icon}
-                    tasks={displayed}
-                    totalCount={columnTasks.length}
-                  />
+      {/* Columns area grows to fill everything except the spacer */}
+      <div className="flex-1 min-h-0 relative">
+        {loading ? (
+          <div className="absolute inset-0 flex gap-3 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory overflow-hidden">
+            {COLUMNS.map(({ key, accent }) => (
+              <div key={key} className="lg:flex-1 lg:min-w-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
+                <div className="bg-(--color-bg-column) rounded-md h-full flex flex-col overflow-hidden">
+                  <div className={`${accent} h-1 w-full rounded-t-xl`} />
                 </div>
-              );
-            })}
-          </div>
-
-          <DragOverlay dropAnimation={{ duration: 200, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>
-            {activeTask && (
-              <div className="rotate-2 scale-105 opacity-95 shadow-xl">
-                <TaskCard task={activeTask} />
               </div>
-            )}
-          </DragOverlay>
-        </DndContext>
-      )}
+            ))}
+            <div className="shimmer-sweep absolute inset-0 pointer-events-none w-1/4 bg-linear-to-r from-transparent via-white/70 to-transparent" />
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={collisionDetection}
+            onDragStart={onDragStart}
+            onDragOver={onDragOver}
+            onDragEnd={onDragEnd}
+          >
+            <div className="absolute inset-0 flex gap-3 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
+              {COLUMNS.map(({ key, label, accent, icon }) => {
+                const columnTasks = tasks.filter((t) => t.status === key);
+                const q = search.trim().toLowerCase();
+                const displayed = columnTasks.filter((t) => {
+                  if (filterPriority && t.priority !== filterPriority) return false;
+                  if (filterAssignee === "__unassigned__" && t.assigneeIds?.length) return false;
+                  if (filterAssignee && filterAssignee !== "__unassigned__" && !t.assigneeIds?.includes(filterAssignee)) return false;
+                  if (q && !`${t.title} ${t.description ?? ""}`.toLowerCase().includes(q)) return false;
+                  return true;
+                });
+                return (
+                  <div key={key} className="lg:flex-1 lg:min-w-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
+                    <Column
+                      columnKey={key}
+                      title={label}
+                      accent={accent}
+                      icon={icon}
+                      tasks={displayed}
+                      totalCount={columnTasks.length}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            <DragOverlay dropAnimation={{ duration: 200, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>
+              {activeTask && (
+                <div className="rotate-2 scale-105 opacity-95 shadow-xl">
+                  <TaskCard task={activeTask} />
+                </div>
+              )}
+            </DragOverlay>
+          </DndContext>
+        )}
+      </div>
+
+      {/* Bottom gap — real DOM element so overflow-hidden can't swallow it */}
+      <div className="h-10 shrink-0" />
 
       <NewTaskWindow />
     </div>

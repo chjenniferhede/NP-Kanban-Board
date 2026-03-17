@@ -20,7 +20,7 @@ export function useTeam() {
   async function fetchTeam() {
     if (!session) return;
     const res = await fetch(`${API}/api/team`, { headers: authHeaders() });
-    if (!res.ok) return;
+    if (!res.ok) throw new Error(`Failed to load team (${res.status})`);
     setTeam(await res.json());
   }
 

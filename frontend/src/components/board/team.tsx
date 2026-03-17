@@ -6,12 +6,15 @@ import { AVATAR_COLORS, resolveAvatarColor } from "../../lib/avatarColors";
 import { useToast } from "../toast";
 
 export default function Team() {
-  const { team, fetchTeam, createMember } = useTeam();
+  const { team, fetchTeam, createMember, deleteMember } = useTeam();
   const session = useAtomValue(sessionAtom);
   const toast = useToast();
   const [name, setName]     = useState("");
   const [color, setColor]   = useState<string>(AVATAR_COLORS[0].value);
   const [adding, setAdding] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<{ id: string; name: string } | null>(null);
+  const meMemberId = localStorage.getItem("me-member-id");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -25,7 +28,10 @@ export default function Team() {
         localStorage.setItem("me-member-id", member.id);
       } catch {
         localStorage.removeItem("me-member-id");
+        toast("Failed to join the board. Please refresh.", "error");
       }
+    }).catch(() => {
+      toast("Failed to load team members. Please refresh.", "error");
     });
   }, [session?.userId]);
 
@@ -51,6 +57,20 @@ export default function Team() {
     }
   }
 
+  async function confirmDelete() {
+    if (!memberToDelete) return;
+    setDeleting(true);
+    try {
+      await deleteMember(memberToDelete.id);
+      (document.getElementById("delete-teammate-modal") as HTMLDialogElement).close();
+      setMemberToDelete(null);
+    } catch {
+      toast("Failed to remove teammate.", "error");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <>
       <div className="flex items-center gap-3">
@@ -60,13 +80,36 @@ export default function Team() {
               <i className="fa-regular fa-user text-base-content/40 text-[13px]" />
             </div>
           </div>
-          {team.map((member) => (
-            <div key={member.id} className="tooltip tooltip-left" data-tip={member.name}>
-              <div style={{ backgroundColor: resolveAvatarColor(member.color) }} className="rounded-full w-8 h-8 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100">
-                {member.initials}
+          {team.map((member) => {
+            const isMe = member.id === meMemberId;
+            if (isMe) {
+              return (
+                <div key={member.id} className="tooltip tooltip-left" data-tip={`${member.name}`}>
+                  <div style={{ backgroundColor: resolveAvatarColor(member.color) }} className="rounded-full w-8 h-8 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100">
+                    {member.initials}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key={member.id} className="relative group w-8 h-8">
+                <div style={{ backgroundColor: resolveAvatarColor(member.color) }} className="rounded-full w-8 h-8 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100">
+                  {member.initials}
+                </div>
+                <button
+                  className="tooltip tooltip-left absolute inset-0 rounded-full flex items-center justify-center ring-2 ring-base-100 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                  data-tip={member.name}
+                  style={{ backgroundColor: resolveAvatarColor(member.color) }}
+                  onClick={() => {
+                    setMemberToDelete({ id: member.id, name: member.name });
+                    (document.getElementById("delete-teammate-modal") as HTMLDialogElement).showModal();
+                  }}
+                >
+                  <i className="fa-solid fa-trash text-[12px] opacity-70" />
+                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <button
@@ -79,6 +122,30 @@ export default function Team() {
           </svg>
         </button>
       </div>
+
+      <dialog id="delete-teammate-modal" className="modal backdrop:bg-black/60">
+        <div className="modal-box flex flex-col gap-4">
+          <h3 className="font-bold text-lg">Remove teammate</h3>
+          <p className="text-sm text-base-content/70">
+            Are you sure you want to remove <span className="font-semibold text-base-content">{memberToDelete?.name}</span> from the team?
+          </p>
+          <div className="modal-action mt-0">
+            <button
+              className="btn btn-ghost"
+              onClick={() => {
+                (document.getElementById("delete-teammate-modal") as HTMLDialogElement).close();
+                setMemberToDelete(null);
+              }}
+            >
+              Cancel
+            </button>
+            <button className="btn btn-error" onClick={confirmDelete} disabled={deleting}>
+              {deleting ? <span className="loading loading-spinner loading-xs" /> : "Remove"}
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop"><button>close</button></form>
+      </dialog>
 
       <dialog id="add-teammate-modal" className="modal backdrop:bg-black/60">
         <div className="modal-box flex flex-col gap-4">

@@ -63,22 +63,22 @@ export default function TaskCard({ task }: Props) {
           {p ? <Tag label={p.label} className={p.cls} /> : <span />}
           <div className="flex items-center gap-2 ml-auto">
             {commentCount > 0 && (
-              <span className="inline-flex items-center gap-1 text-xs text-base-content/50">
-                <i className="fa-regular fa-comment text-[11px]" />
+              <span className="inline-flex items-center gap-1 text-xs text-base-content/50 w-6 h-6 justify-center">
+                <i className="fa-regular fa-comment text-[9px]" />
                 {commentCount}
               </span>
             )}
             <button
               onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
-              className="text-base-content/30 hover:text-error hover:bg-error/10 rounded px-1.5 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+              className="w-6 h-6 flex items-center justify-center text-base-content/30 hover:text-error hover:bg-error/10 rounded transition-colors disabled:opacity-30 disabled:pointer-events-none"
               disabled={!!fetchError}
             >
-              <i className="fa-regular fa-trash-can text-[9px]" />
+              <i className="fa-regular fa-trash-can text-[10px]" />
             </button>
           </div>
         </div>
 
-        <p className="font-medium text-md leading-snug pl-0.5">{task.title}</p>
+        <p className="font-semibold text-md leading-snug pl-0.5">{task.title}</p>
 
         {task.description && (
           <p className="text-xs text-base-content/60 line-clamp-2 pl-1">

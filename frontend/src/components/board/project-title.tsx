@@ -43,7 +43,7 @@ export default function ProjectTitle() {
     <div className="flex items-center gap-2">
       <div className="relative">
         {/* Invisible sizer keeps layout stable */}
-        <h1 className="text-2xl font-bold invisible whitespace-pre">{draft || "My Project"}</h1>
+        <h1 className="text-2xl font-extrabold invisible whitespace-pre">{draft || "My Project"}</h1>
         {editing ? (
           <input
             ref={inputRef}
@@ -54,10 +54,10 @@ export default function ProjectTitle() {
               if (e.key === "Enter") commit();
               if (e.key === "Escape") cancel();
             }}
-            className="absolute inset-0 text-2xl font-bold bg-transparent border-none outline-none w-full"
+            className="absolute inset-0 text-2xl font-extrabold bg-transparent border-none outline-none w-full"
           />
         ) : (
-          <h1 className="absolute inset-0 text-2xl font-bold">{title}</h1>
+          <h1 className="absolute inset-0 text-2xl font-extrabold">{title}</h1>
         )}
       </div>
       <button

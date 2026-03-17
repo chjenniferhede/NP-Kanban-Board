@@ -179,7 +179,7 @@ export default function CardDetails({ task, onClose }: Props) {
 
             {/* Description */}
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Description</legend>
+              <legend className="fieldset-legend text-sm font-semibold">Description</legend>
               <EditableText
                 value={task.description ?? ""}
                 onSave={(v) => patch({ description: v })}
@@ -191,7 +191,7 @@ export default function CardDetails({ task, onClose }: Props) {
 
             {/* Activity */}
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Activity</legend>
+              <legend className="fieldset-legend text-sm font-semibold">Activity</legend>
 
               <div className="flex flex-col gap-2 mb-4">
                 {comments.length === 0 && (

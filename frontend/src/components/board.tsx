@@ -86,13 +86,16 @@ export default function Board() {
     const overId   = over.id as string;
     if (activeId === overId) return;
 
-    // Use center-to-center comparison so grab offset doesn't affect insertAfter.
+    // Use the dragged card's top edge (not center) so the card only slots after
+    // a target once its leading edge crosses the target's midpoint. Using center
+    // caused off-by-one drops when the target card had shifted down after a
+    // cross-column insertion and the center was just past the new midpoint.
     // Capture outside the updater to avoid the ref being mutated before it runs.
     const draggingRect = active.rect.current.translated;
-    const draggingCenter = draggingRect
-      ? draggingRect.top + draggingRect.height / 2
+    const draggingEdge = draggingRect
+      ? draggingRect.top
       : active.rect.current.initial
-        ? active.rect.current.initial.top + active.rect.current.initial.height / 2
+        ? active.rect.current.initial.top
         : 0;
 
     setTasks((prev) => {
@@ -128,7 +131,7 @@ export default function Board() {
         return arrayMove(prev, activeIndex, overIndex);
       }
 
-      const insertAfter = draggingCenter > over.rect.top + over.rect.height / 2;
+      const insertAfter = draggingEdge > over.rect.top + over.rect.height / 2;
       const without = prev.filter((t) => t.id !== activeId);
       const idx = without.findIndex((t) => t.id === overId);
       without.splice(insertAfter ? idx + 1 : idx, 0, { ...draggedTask, status: overTask.status });

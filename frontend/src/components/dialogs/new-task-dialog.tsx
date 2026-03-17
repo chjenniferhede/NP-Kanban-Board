@@ -3,7 +3,7 @@ import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
 import { useToast } from "../ui/toast";
 import Dropdown from "../ui/dropdown";
-import AssigneeSelection from "./assignee-selection";
+import AssigneeSelection from "../board/assignee-selection";
 
 const MODAL_ID = "new-task-modal";
 

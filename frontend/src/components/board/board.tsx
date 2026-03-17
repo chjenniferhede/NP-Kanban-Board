@@ -166,7 +166,7 @@ export default function Board() {
             <p className="text-xs text-base-content/30">Error code: {fetchErrorCode}</p>
           )}
           <button className="btn btn-action btn-sm mt-2" onClick={fetchTasks}>
-            Go to board
+            Retry
           </button>
         </div>
       </div>

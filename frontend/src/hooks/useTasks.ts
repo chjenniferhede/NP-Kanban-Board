@@ -47,7 +47,7 @@ export function useTasks() {
   }
 
   async function createTask(
-    fields: Pick<Task, "title"> & Partial<Pick<Task, "description" | "priority" | "dueDate">>
+    fields: Pick<Task, "title"> & Partial<Pick<Task, "description" | "priority" | "dueDate" | "assigneeIds">>
   ) {
     const res = await fetch(`${API}/api/tasks`, {
       method: "POST",

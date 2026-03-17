@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import type { Task } from "../../../types";
 import Tasks from "./tasks";
@@ -12,24 +13,42 @@ type Props = {
 };
 
 export default function Column({ columnKey, title, tasks, accent, icon, totalCount }: Props) {
-  // The whole column body is the droppable — works even when empty
   const { setNodeRef, isOver } = useDroppable({ id: columnKey });
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  function setRefs(node: HTMLDivElement | null) {
+    setNodeRef(node);
+    scrollRef.current = node;
+  }
+
+  function handleScroll() {
+    setScrolled((scrollRef.current?.scrollTop ?? 0) > 0);
+  }
 
   return (
-    <div className="bg-(--color-bg-column) rounded-md flex-1 h-full flex flex-col overflow-hidden">
+    <div className="bg-(--color-bg-column) rounded-md h-full flex flex-col overflow-hidden">
       <div className={`${accent} h-1 w-full rounded-t-md`} />
 
-      <div
-        ref={setNodeRef}
-        className={`p-3 flex flex-col gap-3 flex-1 transition-colors duration-150 ${isOver ? "bg-base-300" : ""}`}
-      >
-        <div className="flex items-center gap-2 px-1">
-          <i className={`fa-solid ${icon} text-xs text-base-content/40`} />
-          <h3 className="font-semibold text-sm">{title}</h3>
-          <span className="badge badge-ghost badge-sm">{tasks.length} of {totalCount}</span>
-        </div>
+      {/* Header — always visible */}
+      <div className="flex items-center gap-2 px-4 py-3">
+        <i className={`fa-solid ${icon} text-xs text-base-content/40`} />
+        <h3 className="font-semibold text-sm">{title}</h3>
+        <span className="badge badge-ghost badge-sm">{tasks.length} of {totalCount}</span>
+      </div>
 
-        <Tasks columnKey={columnKey} tasks={tasks} />
+      {/* Scrollable tasks area */}
+      <div className="relative flex-1 min-h-0">
+        {scrolled && (
+          <div className="absolute top-0 left-0 right-0 h-6 bg-linear-to-b from-black/10 to-transparent pointer-events-none z-10" />
+        )}
+        <div
+          ref={setRefs}
+          onScroll={handleScroll}
+          className={`h-full overflow-y-auto px-3 pb-3 flex flex-col gap-2 transition-colors duration-150 ${isOver ? "bg-base-300" : ""}`}
+        >
+          <Tasks columnKey={columnKey} tasks={tasks} />
+        </div>
       </div>
     </div>
   );

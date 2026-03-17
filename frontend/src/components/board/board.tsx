@@ -171,7 +171,7 @@ export default function Board() {
   }
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden min-h-0">
       <Bar
         priority={filterPriority}
         assignee={filterAssignee}
@@ -183,9 +183,9 @@ export default function Board() {
       />
 
       {loading ? (
-        <div className="flex gap-3 flex-1 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory relative overflow-hidden">
+        <div className="flex gap-3 flex-1 min-h-0 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory relative overflow-hidden">
           {COLUMNS.map(({ key, accent }) => (
-            <div key={key} className="lg:flex-1 lg:min-w-0 max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
+            <div key={key} className="lg:flex-1 lg:min-w-0 min-h-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
               <div className="bg-base-200 rounded-md h-full flex flex-col overflow-hidden">
                 <div className={`${accent} h-1 w-full rounded-t-xl`} />
               </div>
@@ -205,7 +205,7 @@ export default function Board() {
           onDragOver={onDragOver}
           onDragEnd={onDragEnd}
         >
-          <div className="flex gap-3 flex-1 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
+          <div className="flex gap-3 flex-1 min-h-0 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
             {COLUMNS.map(({ key, label, accent, icon }) => {
               const columnTasks = tasks.filter((t) => t.status === key);
               const q = search.trim().toLowerCase();
@@ -216,7 +216,7 @@ export default function Board() {
                 return true;
               });
               return (
-                <div key={key} className="lg:flex-1 lg:min-w-0 max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
+                <div key={key} className="lg:flex-1 lg:min-w-0 min-h-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
                   <Column
                     columnKey={key}
                     title={label}

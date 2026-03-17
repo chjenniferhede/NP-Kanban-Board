@@ -66,6 +66,15 @@ body, * {
   background: transparent;
 }
 
+/* ── Default border color for all inputs/textareas ───────────────── */
+.input,
+.input-bordered,
+.textarea,
+input,
+textarea {
+  border-color: rgb(113 95 87 / 0.4) !important;
+}
+
 /* ── Focus ring (shadow, no layout shift) ────────────────────────── */
 input:focus,
 textarea:focus,

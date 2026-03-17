@@ -42,28 +42,24 @@ export default function Workload() {
               <span className="text-[10px] text-base-content/40">{pct}%</span>
             </div>
 
-            {row.tasks.length > 0 ? (
-              <div className="flex items-center gap-px relative h-5">
+            <div className="flex items-center gap-px relative h-5">
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{ backgroundColor: "var(--color-bg-sidebar)", width: `${maxTasks * (BLOCK_W + BLOCK_GAP)}px` }}
+              />
+              {row.tasks.map((task, i) => (
                 <div
-                  className="absolute inset-0 rounded-sm bg-base-300/50"
-                  style={{ width: `${maxTasks * (BLOCK_W + BLOCK_GAP)}px` }}
+                  key={task.id}
+                  className="h-full rounded-sm shrink-0 relative"
+                  style={{
+                    width: BLOCK_W,
+                    backgroundColor: STATUS_COLOR[task.status],
+                    marginLeft: i === 0 ? 0 : BLOCK_GAP,
+                  }}
+                  title={task.title}
                 />
-                {row.tasks.map((task, i) => (
-                  <div
-                    key={task.id}
-                    className="h-full rounded-sm shrink-0 relative"
-                    style={{
-                      width: BLOCK_W,
-                      backgroundColor: STATUS_COLOR[task.status],
-                      marginLeft: i === 0 ? 0 : BLOCK_GAP,
-                    }}
-                    title={task.title}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="h-1 rounded-sm bg-base-300/30" />
-            )}
+              ))}
+            </div>
           </div>
         );
       })}

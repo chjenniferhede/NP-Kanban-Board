@@ -31,7 +31,7 @@ export default function Bar({ priority, assignee, label, team, onPriorityChange,
           options={[
             { value: "", label: "All priority" },
             { value: "low", label: "Low" },
-            { value: "normal", label: "Normal" },
+            { value: "normal", label: "Medium" },
             { value: "high", label: "High" },
           ]}
         />

@@ -20,7 +20,7 @@ export default function App() {
 
         {/* ── Main content ── */}
         <div className="drawer-content flex flex-col overflow-hidden">
-          <main className="flex-1 overflow-auto p-4 md:p-6 flex flex-col border-y border-gray-300">
+          <main className="flex-1 overflow-hidden min-h-0 p-4 md:p-6 flex flex-col border-y border-gray-300">
             <div className="flex items-center justify-between mb-4">
               <ProjectTitle />
               <Team />

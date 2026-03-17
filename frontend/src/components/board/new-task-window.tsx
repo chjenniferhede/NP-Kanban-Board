@@ -3,6 +3,7 @@ import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
 import { useToast } from "../toast";
 import Dropdown from "../dropdown";
+import AssigneeSelection from "./assignee-selection";
 
 const MODAL_ID = "new-task-modal";
 
@@ -17,6 +18,7 @@ export default function NewTaskWindow() {
   const [description, setDescription] = useState("");
   const [priority, setPriority]       = useState<Task["priority"]>(undefined);
   const [dueDate, setDueDate]         = useState("");
+  const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
   const [submitting, setSubmitting]   = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const [titleError, setTitleError]   = useState(false);
@@ -26,6 +28,7 @@ export default function NewTaskWindow() {
     setDescription("");
     setPriority(undefined);
     setDueDate("");
+    setAssigneeIds([]);
     if (dateInputRef.current) dateInputRef.current.value = "";
     setTitleError(false);
   }
@@ -43,6 +46,7 @@ export default function NewTaskWindow() {
         description: description.trim() || undefined,
         priority: priority || undefined,
         dueDate: dueDate || undefined,
+        assigneeIds: assigneeIds.length ? assigneeIds : undefined,
       });
       reset();
       (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
@@ -61,7 +65,7 @@ export default function NewTaskWindow() {
   return (
     <>
     <dialog id={MODAL_ID} className="modal backdrop:bg-black/60">
-      <div className="modal-box w-full max-w-2xl flex flex-col gap-7 pb-16">
+      <div className="modal-box w-full max-w-2xl flex flex-col gap-4 pb-16">
         <h3 className="font-bold text-lg">New task</h3>
 
         {/* Title */}
@@ -90,6 +94,9 @@ export default function NewTaskWindow() {
             onChange={(e) => setDescription(e.target.value)}
           />
         </fieldset>
+
+        {/* Assignee */}
+        <AssigneeSelection assigneeIds={assigneeIds} onChange={setAssigneeIds} />
 
         {/* Priority + Due date side by side */}
         <div className="flex gap-2">
@@ -124,7 +131,7 @@ export default function NewTaskWindow() {
 
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={handleClose}>Cancel</button>
-          <button className="btn btn-action" onClick={handleAdd} disabled={!title.trim() || submitting}>
+          <button className="btn btn-action" onClick={handleAdd} disabled={submitting}>
             {submitting ? <span className="loading loading-spinner loading-xs" /> : "Add task"}
           </button>
         </div>

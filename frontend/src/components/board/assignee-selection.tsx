@@ -41,7 +41,7 @@ export default function AssigneeSelection({ assigneeIds, onChange }: Props) {
                 type="button"
                 onClick={() => toggle(m.id)}
                 style={{ backgroundColor: resolveAvatarColor(m.color) }}
-                className={`w-9 h-9 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                className={`w-9 h-9 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring(--color-status-in-review) ring-offset-1" : "opacity-50 hover:opacity-100"}`}
               >
                 {m.initials}
               </button>

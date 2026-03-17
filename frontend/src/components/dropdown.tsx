@@ -14,7 +14,7 @@ type Props = {
 function Avatar({ initials, color }: { initials: string; color: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center rounded-full text-white text-xs font-semibold shrink-0"
+      className="inline-flex items-center justify-center rounded-full text-xs font-semibold shrink-0"
       style={{ backgroundColor: color, width: 22, height: 22 }}
     >
       {initials}

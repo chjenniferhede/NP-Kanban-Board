@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../../types";
 import { teamAtom } from "../../../hooks/useTeam";
+import { resolveAvatarColor } from "../../../lib/avatarColors";
 import Tag from "./tag";
 import CardDetails from "../card-details";
 
@@ -45,7 +46,7 @@ export default function TaskCard({ task }: Props) {
         {...attributes}
         {...listeners}
         onClick={() => setOpen(true)}
-        className="bg-base-100 shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full transition-all duration-150 hover:-translate-y-0.3 hover:shadow-md"
+        className="bg-[#fcf8f5] shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full transition-all duration-150 hover:-translate-y-0.3 hover:shadow-md"
       >
         {/* Top badge row */}
         {p && (
@@ -78,7 +79,7 @@ export default function TaskCard({ task }: Props) {
               </div>
             ) : assignees.map((m) => (
               <div key={m.id} className="tooltip tooltip-left" data-tip={m.name}>
-                <div className={`${m.color} w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-semibold ring-1 ring-base-100`}>
+                <div style={{ backgroundColor: resolveAvatarColor(m.color) }} className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-semibold ring-1 ring-base-100">
                   {m.initials}
                 </div>
               </div>
@@ -91,3 +92,4 @@ export default function TaskCard({ task }: Props) {
     </>
   );
 }
+

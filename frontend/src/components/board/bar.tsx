@@ -1,6 +1,7 @@
 import { openNewTaskModal } from "./new-task-window";
 import Dropdown from "../dropdown";
 import type { TeamMember } from "../../types";
+import { resolveAvatarColor } from "../../lib/avatarColors";
 
 type Props = {
   priority: string;
@@ -15,7 +16,7 @@ type Props = {
 export default function Bar({ priority, assignee, label, team, onPriorityChange, onAssigneeChange, onLabelChange }: Props) {
   const assigneeOptions = [
     { value: "", label: "All assignee" },
-    ...team.map((m) => ({ value: m.id, label: m.name, initials: m.initials, color: m.color })),
+    ...team.map((m) => ({ value: m.id, label: m.name, initials: m.initials, color: resolveAvatarColor(m.color) })),
   ];
 
   return (
@@ -25,7 +26,7 @@ export default function Bar({ priority, assignee, label, team, onPriorityChange,
           label="All priority"
           value={priority}
           onChange={onPriorityChange}
-          buttonClassName="btn btn-ghost btn-md border border-gray-300 min-w-36 font-normal"
+          buttonClassName="btn btn-filter btn-md min-w-36"
           menuClassName="w-full"
           options={[
             { value: "", label: "All priority" },
@@ -38,7 +39,7 @@ export default function Bar({ priority, assignee, label, team, onPriorityChange,
           label="All assignee"
           value={assignee}
           onChange={onAssigneeChange}
-          buttonClassName="btn btn-ghost border-gray-300 btn-md border border-base-300 min-w-36 font-normal"
+          buttonClassName="btn btn-filter btn-md min-w-36"
           menuClassName="w-full"
           options={assigneeOptions}
         />
@@ -46,13 +47,13 @@ export default function Bar({ priority, assignee, label, team, onPriorityChange,
           label="All label"
           value={label}
           onChange={onLabelChange}
-          buttonClassName="btn btn-ghost btn-md border border-gray-300 min-w-36 font-normal"
+          buttonClassName="btn btn-filter btn-md min-w-36"
           menuClassName="w-full"
           options={[{ value: "", label: "All label" }]}
         />
       </div>
 
-      <button className="btn btn-primary" onClick={openNewTaskModal}>
+      <button className="btn btn-action" onClick={openNewTaskModal}>
         + New task
       </button>
     </div>

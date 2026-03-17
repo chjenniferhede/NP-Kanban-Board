@@ -4,6 +4,7 @@ import { useAtomValue } from "jotai";
 import type { Task, Comment } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
 import { teamAtom } from "../../hooks/useTeam";
+import { resolveAvatarColor } from "../../lib/avatarColors";
 import { sessionAtom } from "../../hooks/useAuth";
 import Tag from "./column/tag";
 import Dropdown from "../dropdown";
@@ -216,7 +217,7 @@ export default function CardDetails({ task, onClose }: Props) {
                   onChange={(e) => setCommentDraft(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submitComment()}
                 />
-                <button className="btn btn-primary btn-sm" onClick={submitComment} disabled={submittingComment}>
+                <button className="btn btn-action btn-sm" onClick={submitComment} disabled={submittingComment}>
                   {submittingComment
                     ? <span className="loading loading-spinner loading-xs" />
                     : <i className="fa-solid fa-paper-plane" />}
@@ -236,7 +237,7 @@ export default function CardDetails({ task, onClose }: Props) {
                 label="Status"
                 value={task.status}
                 onChange={(v) => patch({ status: v as Task["status"] })}
-                buttonClassName="btn btn-ghost btn-xs border border-base-300 w-full font-normal text-xs"
+                buttonClassName="btn btn-filter btn-xs w-full text-xs"
                 menuClassName="w-full"
                 options={[
                   { value: "todo",        label: "To Do" },
@@ -253,7 +254,7 @@ export default function CardDetails({ task, onClose }: Props) {
                 label="None"
                 value={task.priority ?? ""}
                 onChange={(v) => patch({ priority: (v as Task["priority"]) || undefined })}
-                buttonClassName="btn btn-ghost btn-xs border border-base-300 w-full font-normal text-xs"
+                buttonClassName="btn btn-filter btn-xs w-full text-xs"
                 menuClassName="w-full"
                 options={[
                   { value: "",       label: "None" },
@@ -296,7 +297,8 @@ export default function CardDetails({ task, onClose }: Props) {
                     <div key={m.id} className="tooltip tooltip-bottom" data-tip={m.name}>
                       <button
                         onClick={() => toggleAssignee(m.id)}
-                        className={`${m.color} w-7 h-7 rounded-full text-white text-[9px] font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                        style={{ backgroundColor: resolveAvatarColor(m.color) }}
+                        className={`w-7 h-7 rounded-full text-[9px] font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
                       >
                         {m.initials}
                       </button>

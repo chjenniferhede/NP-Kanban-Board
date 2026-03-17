@@ -1,4 +1,5 @@
 import { atom, useAtom } from "jotai";
+import { DEFAULT_AVATAR_COLOR } from "../lib/avatarColors";
 
 export type MeProfile = {
   name: string;
@@ -6,7 +7,7 @@ export type MeProfile = {
   color: string;
 };
 
-const DEFAULT: MeProfile = { name: "Me", initials: "ME", color: "bg-indigo-400" };
+const DEFAULT: MeProfile = { name: "Me", initials: "ME", color: DEFAULT_AVATAR_COLOR };
 
 function load(): MeProfile {
   try {

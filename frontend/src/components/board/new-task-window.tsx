@@ -99,7 +99,7 @@ export default function NewTaskWindow() {
               label="None"
               value={priority ?? ""}
               onChange={(v) => setPriority((v as Task["priority"]) || undefined)}
-              buttonClassName="btn btn-ghost btn-md border border-base-300 w-full font-normal"
+              buttonClassName="btn btn-filter btn-md w-full"
               menuClassName="w-full"
               options={[
                 { value: "",       label: "None" },
@@ -123,7 +123,7 @@ export default function NewTaskWindow() {
 
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={handleClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleAdd} disabled={!title.trim() || submitting}>
+          <button className="btn btn-action" onClick={handleAdd} disabled={!title.trim() || submitting}>
             {submitting ? <span className="loading loading-spinner loading-xs" /> : "Add task"}
           </button>
         </div>

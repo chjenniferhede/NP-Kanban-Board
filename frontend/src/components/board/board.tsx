@@ -22,13 +22,14 @@ import Column from "./column/column";
 import TaskCard from "./column/task";
 import NewTaskWindow from "./new-task-window";
 import Bar from "./bar";
+import { useToast } from "../toast";
 
 
 const COLUMNS = [
-  { key: "todo",        label: "To Do",       accent: "bg-[#DA4D3F]" },
-  { key: "in_progress", label: "In Progress", accent: "bg-[#E8B402]" },
-  { key: "in_review",   label: "In Review",   accent: "bg-[#4D3F8D]" },
-  { key: "done",        label: "Done",        accent: "bg-[#007F47]" },
+  { key: "todo",        label: "To Do",       accent: "bg-(--color-status-todo)" },
+  { key: "in_progress", label: "In Progress", accent: "bg-(--color-status-in-progress)" },
+  { key: "in_review",   label: "In Review",   accent: "bg-(--color-status-in-review)" },
+  { key: "done",        label: "Done",        accent: "bg-(--color-status-done)" },
 ] as const;
 
 const collisionDetection: CollisionDetection = (args) => {
@@ -64,6 +65,7 @@ export default function Board() {
 
   const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
+  const toast = useToast();
   useEffect(() => { if (session) fetchTasks(); }, [session?.userId]);
 
   const sensors = useSensors(
@@ -121,11 +123,16 @@ export default function Board() {
     });
   }
 
-  function onDragEnd({ active }: DragEndEvent) {
+  async function onDragEnd({ active }: DragEndEvent) {
     if (activeTask) {
       const current = tasks.find((t) => t.id === active.id);
       if (current && current.status !== activeTask.status) {
-        updateTask(active.id as string, { status: current.status });
+        try {
+          await updateTask(active.id as string, { status: current.status });
+        } catch {
+          toast("Failed to move task. Please try again.", "error");
+          setTasks((prev) => prev.map((t) => t.id === active.id ? { ...t, status: activeTask.status } : t));
+        }
       }
     }
     setActiveTask(null);
@@ -173,10 +180,12 @@ export default function Board() {
       />
 
       {loading ? (
-        <div className="flex gap-4 flex-1 overflow-y-hidden pb-4 relative overflow-hidden">
+        <div className="flex gap-3 flex-1 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory relative overflow-hidden">
           {COLUMNS.map(({ key, accent }) => (
-            <div key={key} className="bg-base-200 rounded-md flex-1 flex flex-col overflow-hidden">
-              <div className={`${accent} h-1 w-full rounded-t-xl`} />
+            <div key={key} className="lg:flex-1 lg:min-w-0 max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
+              <div className="bg-base-200 rounded-md h-full flex flex-col overflow-hidden">
+                <div className={`${accent} h-1 w-full rounded-t-xl`} />
+              </div>
             </div>
           ))}
           {/* single shimmer sweep across all columns */}
@@ -193,7 +202,7 @@ export default function Board() {
           onDragOver={onDragOver}
           onDragEnd={onDragEnd}
         >
-          <div className="flex gap-4 flex-1 overflow-y-hidden pb-4">
+          <div className="flex gap-3 flex-1 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
             {COLUMNS.map(({ key, label, accent }) => {
               const columnTasks = tasks.filter((t) => t.status === key);
               const displayed = columnTasks.filter((t) => {
@@ -202,14 +211,15 @@ export default function Board() {
                 return true;
               });
               return (
-                <Column
-                  key={key}
-                  columnKey={key}
-                  title={label}
-                  accent={accent}
-                  tasks={displayed}
-                  totalCount={columnTasks.length}
-                />
+                <div key={key} className="lg:flex-1 lg:min-w-0 max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
+                  <Column
+                    columnKey={key}
+                    title={label}
+                    accent={accent}
+                    tasks={displayed}
+                    totalCount={columnTasks.length}
+                  />
+                </div>
               );
             })}
           </div>

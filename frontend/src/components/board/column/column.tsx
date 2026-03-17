@@ -15,7 +15,7 @@ export default function Column({ columnKey, title, tasks, accent, totalCount }: 
   const { setNodeRef, isOver } = useDroppable({ id: columnKey });
 
   return (
-    <div className="bg-[#f8efe6] rounded-md flex-1 flex flex-col overflow-hidden">
+    <div className="bg-(--color-bg-column) rounded-md flex-1 h-full flex flex-col overflow-hidden">
       <div className={`${accent} h-1 w-full rounded-t-md`} />
 
       <div

@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useMe } from "../hooks/useMe";
 import { useTeam } from "../hooks/useTeam";
 import { AVATAR_COLORS, resolveAvatarColor } from "../lib/avatarColors";
+import { useToast } from "./toast";
 
 const MODAL_ID = "me-profile-modal";
 
 export default function Header() {
   const { me, updateMe } = useMe();
   const { updateMember } = useTeam();
+  const toast = useToast();
   const [draftName, setDraftName]   = useState("");
   const [draftColor, setDraftColor] = useState("");
 
@@ -18,26 +20,37 @@ export default function Header() {
   }
 
   function getInitials(name: string) {
-    return name.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "ME";
+    return name.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?";
   }
 
-  function save() {
-    if (!draftName.trim()) return;
-    const fields = { name: draftName.trim(), initials: getInitials(draftName), color: draftColor };
-    updateMe(fields);
-    const meMemberId = localStorage.getItem("me-member-id");
-    if (meMemberId && meMemberId !== "pending") updateMember(meMemberId, fields);
-    (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
+  async function save() {
+    if (!draftName.trim()) {
+      toast("Name cannot be empty.", "error");
+      return;
+    }
+    try {
+      const fields = { name: draftName.trim(), initials: getInitials(draftName), color: draftColor };
+      updateMe(fields);
+      const meMemberId = localStorage.getItem("me-member-id");
+      if (meMemberId && meMemberId !== "pending") await updateMember(meMemberId, fields);
+      (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
+    } catch {
+      toast("Failed to save profile.", "error");
+    }
   }
 
   return (
     <header className="navbar bg-base-100 border-b border-base-300 px-6 min-h-20">
-      {/* Left — spacer */}
-      <div className="flex-1" />
+      {/* Left — sidebar toggle (< lg only) */}
+      <div className="flex-1 flex items-center">
+        <label htmlFor="sidebar-drawer" className="btn btn-ghost btn-sm btn-square lg:hidden" aria-label="Open sidebar">
+          <i className="fa-solid fa-bars text-base" />
+        </label>
+      </div>
 
       {/* Center — search bar */}
-      <div className="flex-none w-96 ">
-        <label className="input input-bordered bg-[#f6ede4] flex items-center gap-2 w-full">
+      <div className="hidden md:block flex-none w-96">
+        <label className="input input-bordered bg-(--color-bg-search) flex items-center gap-2 w-full">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 opacity-40" viewBox="0 0 24 24" fill="currentColor">
             <path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z" />
           </svg>

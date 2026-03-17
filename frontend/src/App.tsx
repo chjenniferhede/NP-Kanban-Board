@@ -1,27 +1,42 @@
 import Header from "./components/header";
 import Sidebar from "./components/sidebar/sidebar";
-import Overview from "./components/overview";
+import ProjectTitle from "./components/project-title";
 import Board from "./components/board/board";
 import Team from "./components/board/team";
+import { Toaster } from "./components/toast";
 import { useAuth } from "./hooks/useAuth";
+
+const DRAWER_ID = "sidebar-drawer";
 
 export default function App() {
   useAuth();
   return (
-    <div className="flex flex-col h-screen bg-[#fcf8f5]">
+    <div className="flex flex-col h-screen bg-(--color-bg-app)">
       <Header />
 
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+      {/* drawer-open on lg+: sidebar always visible in layout; below lg: overlay */}
+      <div className="drawer lg:drawer-open flex-1 overflow-hidden">
+        <input id={DRAWER_ID} type="checkbox" className="drawer-toggle" />
 
-        <main className="flex-1 overflow-auto p-6 flex flex-col border-y border-gray-300">
-          <div className="flex items-center justify-between mb-4">
-            <Overview />
-            <Team />
-          </div>
-          <Board />
-        </main>
+        {/* ── Main content ── */}
+        <div className="drawer-content flex flex-col overflow-hidden">
+          <main className="flex-1 overflow-auto p-4 md:p-6 flex flex-col border-y border-gray-300">
+            <div className="flex items-center justify-between mb-4">
+              <ProjectTitle />
+              <Team />
+            </div>
+            <Board />
+          </main>
+        </div>
+
+        {/* ── Sidebar drawer ── */}
+        <div className="drawer-side z-40">
+          <label htmlFor={DRAWER_ID} aria-label="close sidebar" className="drawer-overlay" />
+          <Sidebar />
+        </div>
       </div>
+
+      <Toaster />
     </div>
   );
 }

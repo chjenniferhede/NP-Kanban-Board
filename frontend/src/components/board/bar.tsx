@@ -21,7 +21,7 @@ export default function Bar({ priority, assignee, label, team, onPriorityChange,
 
   return (
     <div className="flex items-center justify-between mb-4 py-2">
-      <div className="flex items-center gap-2">
+      <div className="hidden md:flex items-center gap-2">
         <Dropdown
           label="All priority"
           value={priority}

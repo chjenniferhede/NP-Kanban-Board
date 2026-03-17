@@ -24,9 +24,9 @@ export default function TaskCard({ task }: Props) {
   };
 
   const priorityConfig = {
-    high:   { label: "High",   cls: "bg-red-100   text-red-700" },
-    normal: { label: "Medium", cls: "bg-yellow-100 text-yellow-700" },
-    low:    { label: "Low",    cls: "bg-base-300   text-base-content/60" },
+    high:   { label: "High",   cls: "bg-(--color-priority-high-bg) text-(--color-priority-high-text)" },
+    normal: { label: "Medium", cls: "bg-(--color-priority-mid-bg)  text-(--color-priority-mid-text)" },
+    low:    { label: "Low",    cls: "bg-(--color-priority-low-bg)  text-(--color-priority-low-text)" },
   };
 
   const p = task.priority ? priorityConfig[task.priority] : null;
@@ -46,7 +46,7 @@ export default function TaskCard({ task }: Props) {
         {...attributes}
         {...listeners}
         onClick={() => setOpen(true)}
-        className="bg-[#fcf8f5] shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full transition-all duration-150 hover:-translate-y-0.3 hover:shadow-md"
+        className="bg-(--color-bg-app) shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full transition-all duration-150 hover:-translate-y-0.3 hover:shadow-md"
       >
         {/* Top badge row */}
         {p && (
@@ -73,7 +73,7 @@ export default function TaskCard({ task }: Props) {
           <div className="flex -space-x-1">
             {assignees.length === 0 ? (
               <div className="tooltip tooltip-left" data-tip="Unassigned">
-                <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-(--color-avatar-unassigned) flex items-center justify-center">
                   <i className="fa-regular fa-user text-base-content/40" style={{ fontSize: "10px" }} />
                 </div>
               </div>

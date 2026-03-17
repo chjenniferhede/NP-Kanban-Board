@@ -4,10 +4,10 @@ import { teamAtom } from "../../hooks/useTeam";
 import type { Task } from "../../types";
 
 const STATUS_COLOR: Record<Task["status"], string> = {
-  todo:        "#DA4D3F",
-  in_progress: "#E8B402",
-  in_review:   "#4D3F8D",
-  done:        "#007F47",
+  todo:        "var(--color-status-todo)",
+  in_progress: "var(--color-status-in-progress)",
+  in_review:   "var(--color-status-in-review)",
+  done:        "var(--color-status-done)",
 };
 
 const BLOCK_W = 10; // px per task block

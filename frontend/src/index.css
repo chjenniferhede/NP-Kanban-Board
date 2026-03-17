@@ -1,7 +1,39 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* Avatar color palette */
+/* ── Surface / background colors ─────────────────────────────────── */
+:root {
+  --color-bg-app:     #fcf8f5;   /* main app background, task card */
+  --color-bg-column:  #f8efe6;   /* kanban column background */
+  --color-bg-sidebar: #ede5da;   /* sidebar background */
+  --color-bg-search:  #f6ede4;   /* search input background */
+}
+
+/* ── Status / accent colors ──────────────────────────────────────── */
+:root {
+  --color-status-todo:        #DA4D3F;
+  --color-status-in-progress: #E8B402;
+  --color-status-in-review:   #4D3F8D;
+  --color-status-done:        #007F47;
+}
+
+/* ── Priority badge colors ───────────────────────────────────────── */
+:root {
+  --color-avatar-unassigned: #c9c4c0;   /* unassigned avatar background */
+  --color-priority-high-bg:   #fee2e2;  /* red-100 */
+  --color-priority-high-text: #b91c1c;  /* red-700 */
+  --color-priority-mid-bg:    #fef9c3;  /* yellow-100 */
+  --color-priority-mid-text:  #a16207;  /* yellow-700 */
+  --color-priority-low-bg:    #e5e7eb;
+  --color-priority-low-text:  #a89990;
+}
+
+/* ── Chart colors ────────────────────────────────────────────────── */
+:root {
+  --color-chart-empty: #e5e7eb;  /* empty ring / track background */
+}
+
+/* ── Avatar color palette ────────────────────────────────────────── */
 :root {
   --avatar-pink:     #FFCBE1;
   --avatar-sage:     #D6E5BD;

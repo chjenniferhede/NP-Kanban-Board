@@ -3,10 +3,12 @@ import { useAtomValue } from "jotai";
 import { useTeam } from "../../hooks/useTeam";
 import { sessionAtom } from "../../hooks/useAuth";
 import { AVATAR_COLORS, resolveAvatarColor } from "../../lib/avatarColors";
+import { useToast } from "../toast";
 
 export default function Team() {
   const { team, fetchTeam, createMember } = useTeam();
   const session = useAtomValue(sessionAtom);
+  const toast = useToast();
   const [name, setName]     = useState("");
   const [color, setColor]   = useState(AVATAR_COLORS[0].value);
   const [adding, setAdding] = useState(false);
@@ -18,7 +20,7 @@ export default function Team() {
       localStorage.setItem("me-member-id", "pending");
       try {
         const raw = localStorage.getItem("me-profile");
-        const meProfile = raw ? JSON.parse(raw) : { name: "Me", initials: "ME", color: AVATAR_COLORS[3].value };
+        const meProfile = raw ? JSON.parse(raw) : { name: "Me", initials: "M", color: AVATAR_COLORS[3].value };
         const member = await createMember(meProfile);
         localStorage.setItem("me-member-id", member.id);
       } catch {
@@ -32,13 +34,18 @@ export default function Team() {
   }
 
   async function addTeammate() {
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      toast("Name cannot be empty.", "error");
+      return;
+    }
     setAdding(true);
     try {
       await createMember({ name: name.trim(), initials: getInitials(name), color });
       setName("");
       setColor(AVATAR_COLORS[0].value);
       (document.getElementById("add-teammate-modal") as HTMLDialogElement).close();
+    } catch {
+      toast("Failed to add teammate.", "error");
     } finally {
       setAdding(false);
     }
@@ -49,7 +56,7 @@ export default function Team() {
       <div className="flex items-center gap-3">
         <div className="flex -space-x-2">
           <div className="tooltip tooltip-bottom" data-tip="Unassigned">
-            <div className="bg-base-200 rounded-full w-8 h-8 flex items-center justify-center ring-2 ring-base-100">
+            <div className="bg-(--color-avatar-unassigned) rounded-full w-8 h-8 flex items-center justify-center ring-2 ring-base-100">
               <i className="fa-regular fa-user text-base-content/40" style={{ fontSize: "13px" }} />
             </div>
           </div>

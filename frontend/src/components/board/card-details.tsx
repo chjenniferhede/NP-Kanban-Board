@@ -5,6 +5,7 @@ import type { Task, Comment } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
 import { teamAtom } from "../../hooks/useTeam";
 import { resolveAvatarColor } from "../../lib/avatarColors";
+import { useToast } from "../toast";
 import { sessionAtom } from "../../hooks/useAuth";
 import Tag from "./column/tag";
 import Dropdown from "../dropdown";
@@ -17,9 +18,9 @@ type Props = {
 };
 
 const PRIORITY_CONFIG = {
-  high:   { label: "High",   cls: "bg-red-100 text-red-700" },
-  normal: { label: "Medium", cls: "bg-yellow-100 text-yellow-700" },
-  low:    { label: "Low",    cls: "bg-base-200 text-base-content/50" },
+  high:   { label: "High",   cls: "bg-(--color-priority-high-bg) text-(--color-priority-high-text)" },
+  normal: { label: "Medium", cls: "bg-(--color-priority-mid-bg)  text-(--color-priority-mid-text)" },
+  low:    { label: "Low",    cls: "bg-(--color-priority-low-bg)  text-(--color-priority-low-text)" },
 } as const;
 
 
@@ -87,6 +88,7 @@ export default function CardDetails({ task, onClose }: Props) {
   const { updateTask } = useTasks();
   const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
+  const toast = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentDraft, setCommentDraft] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -105,7 +107,11 @@ export default function CardDetails({ task, onClose }: Props) {
   }, [task.id]);
 
   async function patch(fields: Partial<Task>) {
-    await updateTask(task.id, fields);
+    try {
+      await updateTask(task.id, fields);
+    } catch {
+      toast("Failed to update task.", "error");
+    }
   }
 
   async function submitComment() {
@@ -117,11 +123,12 @@ export default function CardDetails({ task, onClose }: Props) {
         headers: authHeaders(),
         body: JSON.stringify({ text: commentDraft.trim() }),
       });
-      if (res.ok) {
-        const comment: Comment = await res.json();
-        setComments((prev) => [...prev, comment]);
-        setCommentDraft("");
-      }
+      if (!res.ok) throw new Error();
+      const comment: Comment = await res.json();
+      setComments((prev) => [...prev, comment]);
+      setCommentDraft("");
+    } catch {
+      toast("Failed to post comment.", "error");
     } finally {
       setSubmittingComment(false);
     }
@@ -286,7 +293,7 @@ export default function CardDetails({ task, onClose }: Props) {
                 <div className="tooltip tooltip-bottom" data-tip="Unassigned">
                   <button
                     onClick={() => patch({ assigneeIds: [] })}
-                    className={`w-7 h-7 rounded-full bg-base-200 flex items-center justify-center transition-all ${!task.assigneeIds?.length ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                    className={`w-7 h-7 rounded-full bg-(--color-avatar-unassigned) flex items-center justify-center transition-all ${!task.assigneeIds?.length ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
                   >
                     <i className="fa-regular fa-user text-base-content/50" style={{ fontSize: "11px" }} />
                   </button>

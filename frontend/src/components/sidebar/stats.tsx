@@ -2,10 +2,10 @@ import { useAtomValue } from "jotai";
 import { tasksAtom } from "../../hooks/useTasks";
 
 const COLUMNS = [
-  { key: "todo",        label: "To Do",       color: "#DA4D3F" },
-  { key: "in_progress", label: "In Progress", color: "#E8B402" },
-  { key: "in_review",   label: "In Review",   color: "#4D3F8D" },
-  { key: "done",        label: "Done",        color: "#007F47" },
+  { key: "todo",        label: "To Do",       color: "var(--color-status-todo)" },
+  { key: "in_progress", label: "In Progress", color: "var(--color-status-in-progress)" },
+  { key: "in_review",   label: "In Review",   color: "var(--color-status-in-review)" },
+  { key: "done",        label: "Done",        color: "var(--color-status-done)" },
 ] as const;
 
 const R = 32;
@@ -26,7 +26,7 @@ export default function Stats() {
     return (
       <div className="flex flex-col items-center gap-3">
         <svg viewBox="0 0 100 100" width="130" height="130">
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#e5e7eb" strokeWidth="16" />
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke="var(--color-chart-empty)" strokeWidth="16" />
         </svg>
         <p className="text-xs text-base-content/30">No tasks yet</p>
       </div>
@@ -45,7 +45,7 @@ export default function Stats() {
     <div className="flex flex-col items-center gap-4">
       <svg viewBox="0 0 100 100" width="130" height="130">
         {/* Background ring */}
-        <circle cx={CX} cy={CY} r={R} fill="none" stroke="#e5e7eb" strokeWidth="16" />
+        <circle cx={CX} cy={CY} r={R} fill="none" stroke="var(--color-chart-empty)" strokeWidth="16" />
         {segments.map((seg) =>
           seg.count > 0 ? (
             <circle

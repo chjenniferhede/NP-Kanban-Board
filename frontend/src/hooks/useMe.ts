@@ -7,7 +7,7 @@ export type MeProfile = {
   color: string;
 };
 
-const DEFAULT: MeProfile = { name: "Me", initials: "ME", color: DEFAULT_AVATAR_COLOR };
+const DEFAULT: MeProfile = { name: "Me", initials: "M", color: DEFAULT_AVATAR_COLOR };
 
 function load(): MeProfile {
   try {

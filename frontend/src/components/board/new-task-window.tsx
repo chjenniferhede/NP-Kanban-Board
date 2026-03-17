@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
+import { useToast } from "../toast";
 import Dropdown from "../dropdown";
 
 const MODAL_ID = "new-task-modal";
@@ -12,22 +12,28 @@ export function openNewTaskModal() {
 
 export default function NewTaskWindow() {
   const { createTask } = useTasks();
+  const toast = useToast();
   const [title, setTitle]             = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority]       = useState<Task["priority"]>(undefined);
   const [dueDate, setDueDate]         = useState("");
   const [submitting, setSubmitting]   = useState(false);
-  const [toast, setToast]             = useState("");
+  const [titleError, setTitleError]   = useState(false);
 
   function reset() {
     setTitle("");
     setDescription("");
     setPriority(undefined);
     setDueDate("");
+    setTitleError(false);
   }
 
   async function handleAdd() {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
     setSubmitting(true);
     try {
       await createTask({
@@ -39,8 +45,7 @@ export default function NewTaskWindow() {
       reset();
       (document.getElementById(MODAL_ID) as HTMLDialogElement).close();
     } catch {
-      setToast("Failed to create task. Try again.");
-      setTimeout(() => setToast(""), 4000);
+      toast("Failed to create task. Try again.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -53,14 +58,6 @@ export default function NewTaskWindow() {
 
   return (
     <>
-    {toast && createPortal(
-      <div className="toast toast-top toast-center" style={{ zIndex: 9999 }}>
-        <div className="alert alert-error">
-          <span>{toast}</span>
-        </div>
-      </div>,
-      document.body
-    )}
     <dialog id={MODAL_ID} className="modal backdrop:bg-black/60">
       <div className="modal-box w-full max-w-2xl flex flex-col gap-7 pb-16">
         <h3 className="font-bold text-lg">New task</h3>
@@ -71,9 +68,9 @@ export default function NewTaskWindow() {
           <input
             type="text"
             placeholder="Task title"
-            className="input input-bordered w-full"
+            className={`input input-bordered w-full ${titleError ? "input-error" : ""}`}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => { setTitle(e.target.value); if (titleError) setTitleError(false); }}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             autoFocus
           />

@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useDroppable } from "@dnd-kit/core";
-import type { Task } from "../../../types";
+import type { Task } from "../../types";
 import Tasks from "./tasks";
 
 type Props = {

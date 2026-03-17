@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useAtomValue } from "jotai";
 import Header from "./components/header";
-import Sidebar from "./components/sidebar/sidebar";
+import Sidebar from "./components/sidebar";
 import ProjectTitle from "./components/board/project-title";
-import Board from "./components/board/board";
+import Board from "./components/board";
 import Team from "./components/board/team";
 import { Toaster, useToast } from "./components/ui/toast";
 import { useAuth, authErrorAtom } from "./hooks/useAuth";

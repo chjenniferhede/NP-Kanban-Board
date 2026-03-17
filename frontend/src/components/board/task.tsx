@@ -2,15 +2,15 @@ import { useState } from "react";
 import { useAtomValue } from "jotai";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Task } from "../../../types";
-import { teamAtom } from "../../../hooks/useTeam";
-import { useComments } from "../../../hooks/useComments";
-import { useTasks, fetchErrorAtom } from "../../../hooks/useTasks";
-import { resolveAvatarColor } from "../../../lib/avatarColors";
-import { useToast } from "../../ui/toast";
-import Tag from "./tag";
-import CardDetails from "../task-details";
-import DeleteConfirm from "./delete-task-dialog";
+import type { Task } from "../../types";
+import { teamAtom } from "../../hooks/useTeam";
+import { useComments } from "../../hooks/useComments";
+import { useTasks, fetchErrorAtom } from "../../hooks/useTasks";
+import { resolveAvatarColor } from "../../lib/avatarColors";
+import { useToast } from "../ui/toast";
+import Tag from "../ui/tag";
+import CardDetails from "./task-details";
+import DeleteConfirm from "../dialogs/delete-task-dialog";
 
 type Props = {
   task: Task;

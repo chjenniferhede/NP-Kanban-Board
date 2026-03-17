@@ -1,4 +1,4 @@
-import { openNewTaskModal } from "./new-task-dialog";
+import { openNewTaskModal } from "../dialogs/new-task-dialog";
 import Dropdown from "../ui/dropdown";
 import type { TeamMember } from "../../types";
 import { resolveAvatarColor } from "../../lib/avatarColors";

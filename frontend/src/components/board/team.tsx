@@ -4,6 +4,7 @@ import { useTeam } from "../../hooks/useTeam";
 import { sessionAtom } from "../../hooks/useAuth";
 import { AVATAR_COLORS, resolveAvatarColor } from "../../lib/avatarColors";
 import { useToast } from "../ui/toast";
+import DeleteTeammateDialog from "../dialogs/delete-teammate-dialog";
 
 export default function Team() {
   const { team, fetchTeam, createMember, deleteMember } = useTeam();
@@ -123,29 +124,15 @@ export default function Team() {
         </button>
       </div>
 
-      <dialog id="delete-teammate-modal" className="modal backdrop:bg-black/60">
-        <div className="modal-box flex flex-col gap-4">
-          <h3 className="font-bold text-lg">Remove teammate</h3>
-          <p className="text-sm text-base-content/70">
-            Are you sure you want to remove <span className="font-semibold text-base-content">{memberToDelete?.name}</span> from the team?
-          </p>
-          <div className="modal-action mt-0">
-            <button
-              className="btn btn-ghost"
-              onClick={() => {
-                (document.getElementById("delete-teammate-modal") as HTMLDialogElement).close();
-                setMemberToDelete(null);
-              }}
-            >
-              Cancel
-            </button>
-            <button className="btn btn-error" onClick={confirmDelete} disabled={deleting}>
-              {deleting ? <span className="loading loading-spinner loading-xs" /> : "Remove"}
-            </button>
-          </div>
-        </div>
-        <form method="dialog" className="modal-backdrop"><button>close</button></form>
-      </dialog>
+      <DeleteTeammateDialog
+        memberName={memberToDelete?.name ?? ""}
+        deleting={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          (document.getElementById("delete-teammate-modal") as HTMLDialogElement).close();
+          setMemberToDelete(null);
+        }}
+      />
 
       <dialog id="add-teammate-modal" className="modal backdrop:bg-black/60">
         <div className="modal-box flex flex-col gap-4">

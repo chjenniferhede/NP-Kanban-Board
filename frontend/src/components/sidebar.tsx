@@ -1,5 +1,5 @@
-import Stats from "./stats";
-import Workload from "./workload";
+import Stats from "./sidebar/stats";
+import Workload from "./sidebar/workload";
 
 export default function Sidebar() {
   return (

@@ -14,17 +14,17 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useAtom, useAtomValue } from "jotai";
-import type { Task } from "../../types";
-import { tasksAtom, useTasks, fetchErrorCodeAtom, searchAtom } from "../../hooks/useTasks";
-import { useComments } from "../../hooks/useComments";
-import { sessionAtom } from "../../hooks/useAuth";
-import { teamAtom } from "../../hooks/useTeam";
-import Column from "./column/column";
-import TaskCard from "./column/task";
-import NewTaskWindow from "./new-task-dialog";
-import Bar from "./bar";
-import { useToast } from "../ui/toast";
-import { useSeedData } from "../../hooks/useSeedData";
+import type { Task } from "../types";
+import { tasksAtom, useTasks, fetchErrorCodeAtom, searchAtom } from "../hooks/useTasks";
+import { useComments } from "../hooks/useComments";
+import { sessionAtom } from "../hooks/useAuth";
+import { teamAtom } from "../hooks/useTeam";
+import Column from "./board/column";
+import TaskCard from "./board/task";
+import NewTaskWindow from "./dialogs/new-task-dialog";
+import Bar from "./board/filter-bar";
+import { useToast } from "./ui/toast";
+import { useSeedData } from "../hooks/useSeedData";
 
 
 const COLUMNS = [

@@ -10,7 +10,7 @@ export default function Team() {
   const session = useAtomValue(sessionAtom);
   const toast = useToast();
   const [name, setName]     = useState("");
-  const [color, setColor]   = useState(AVATAR_COLORS[0].value);
+  const [color, setColor]   = useState<string>(AVATAR_COLORS[0].value);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function Team() {
         <div className="flex -space-x-2">
           <div className="tooltip tooltip-bottom" data-tip="Unassigned">
             <div className="bg-(--color-avatar-unassigned) rounded-full w-8 h-8 flex items-center justify-center ring-2 ring-base-100">
-              <i className="fa-regular fa-user text-base-content/40" style={{ fontSize: "13px" }} />
+              <i className="fa-regular fa-user text-base-content/40 text-[13px]" />
             </div>
           </div>
           {team.map((member) => (

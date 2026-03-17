@@ -289,15 +289,6 @@ export default function CardDetails({ task, onClose }: Props) {
               />
             </fieldset>
 
-            {/* Start date */}
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend flex items-center gap-1.5">
-                <i className="fa-solid fa-calendar-plus text-[10px]" />
-                Start date
-              </legend>
-              <span className="text-sm text-base-content/30">None</span>
-            </fieldset>
-
             {/* Assignee */}
             <AssigneeSelection
               assigneeIds={task.assigneeIds ?? []}

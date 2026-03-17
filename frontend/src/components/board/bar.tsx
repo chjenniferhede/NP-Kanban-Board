@@ -6,14 +6,12 @@ import { resolveAvatarColor } from "../../lib/avatarColors";
 type Props = {
   priority: string;
   assignee: string;
-  label: string;
   team: TeamMember[];
   onPriorityChange: (v: string) => void;
   onAssigneeChange: (v: string) => void;
-  onLabelChange: (v: string) => void;
 };
 
-export default function Bar({ priority, assignee, label, team, onPriorityChange, onAssigneeChange, onLabelChange }: Props) {
+export default function Bar({ priority, assignee, team, onPriorityChange, onAssigneeChange }: Props) {
   const assigneeOptions = [
     { value: "", label: "All assignee" },
     ...team.map((m) => ({ value: m.id, label: m.name, initials: m.initials, color: resolveAvatarColor(m.color) })),
@@ -42,14 +40,6 @@ export default function Bar({ priority, assignee, label, team, onPriorityChange,
           buttonClassName="btn btn-filter btn-md min-w-36"
           menuClassName="w-full"
           options={assigneeOptions}
-        />
-        <Dropdown
-          label="All label"
-          value={label}
-          onChange={onLabelChange}
-          buttonClassName="btn btn-filter btn-md min-w-36"
-          menuClassName="w-full"
-          options={[{ value: "", label: "All label" }]}
         />
       </div>
 

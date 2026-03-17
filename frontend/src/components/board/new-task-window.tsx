@@ -74,8 +74,7 @@ export default function NewTaskWindow() {
           <input
             type="text"
             placeholder="Task title"
-            className="input input-bordered w-full"
-            style={titleError ? { outline: "2px solid var(--color-error)", outlineOffset: "2px" } : undefined}
+            className={`input input-bordered w-full ${titleError ? "input-invalid" : ""}`}
             value={title}
             onChange={(e) => { setTitle(e.target.value); if (titleError) setTitleError(false); }}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}

@@ -63,7 +63,6 @@ export default function Board() {
 
   const [filterPriority, setFilterPriority] = useState("");
   const [filterAssignee, setFilterAssignee] = useState("");
-  const [filterLabel, setFilterLabel]       = useState("");
 
   const search = useAtomValue(searchAtom);
   const team = useAtomValue(teamAtom);
@@ -147,11 +146,9 @@ export default function Board() {
         <Bar
           priority={filterPriority}
           assignee={filterAssignee}
-          label={filterLabel}
           team={team}
           onPriorityChange={setFilterPriority}
           onAssigneeChange={setFilterAssignee}
-          onLabelChange={setFilterLabel}
         />
         <div className="flex flex-col items-center justify-center flex-1 gap-3 text-center">
           <p className="text-5xl">⚠️</p>
@@ -175,26 +172,23 @@ export default function Board() {
       <Bar
         priority={filterPriority}
         assignee={filterAssignee}
-        label={filterLabel}
         team={team}
         onPriorityChange={setFilterPriority}
         onAssigneeChange={setFilterAssignee}
-        onLabelChange={setFilterLabel}
       />
 
       {loading ? (
         <div className="flex gap-3 flex-1 min-h-0 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory relative overflow-hidden">
           {COLUMNS.map(({ key, accent }) => (
             <div key={key} className="lg:flex-1 lg:min-w-0 min-h-0 h-full max-lg:flex-none max-lg:snap-start max-lg:snap-always max-sm:min-w-full sm:max-lg:min-w-[calc(50%-0.375rem)]">
-              <div className="bg-base-200 rounded-md h-full flex flex-col overflow-hidden">
+              <div className="bg-(--color-bg-column) rounded-md h-full flex flex-col overflow-hidden">
                 <div className={`${accent} h-1 w-full rounded-t-xl`} />
               </div>
             </div>
           ))}
           {/* single shimmer sweep across all columns */}
           <div
-            className="absolute inset-0 pointer-events-none w-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-            style={{ animation: 'shimmer-sweep 2s ease-in-out infinite' }}
+            className="shimmer-sweep absolute inset-0 pointer-events-none w-1/4 bg-linear-to-r from-transparent via-white/70 to-transparent"
           />
         </div>
       ) : (

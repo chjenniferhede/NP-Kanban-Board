@@ -61,7 +61,7 @@ export default function TaskCard({ task }: Props) {
           <div className="flex items-center gap-2 ml-auto">
             {commentCount > 0 && (
               <span className="inline-flex items-center gap-1 text-xs text-base-content/50">
-                <i className="fa-regular fa-comment" style={{ fontSize: "11px" }} />
+                <i className="fa-regular fa-comment text-[11px]" />
                 {commentCount}
               </span>
             )}
@@ -69,7 +69,7 @@ export default function TaskCard({ task }: Props) {
               onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
               className="text-base-content/30 hover:text-error transition-colors"
             >
-              <i className="fa-regular fa-trash-can" style={{ fontSize: "11px" }} />
+              <i className="fa-regular fa-trash-can text-[11px]" />
             </button>
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function TaskCard({ task }: Props) {
         <div className="flex items-center justify-between mt-auto">
           {task.dueDate ? (
             <span className="inline-flex items-center gap-1 text-xs border border-base-300 px-1.5 py-0.5 text-base-content/60">
-              <i className="fa-regular fa-calendar" style={{ fontSize: "10px" }} />
+              <i className="fa-regular fa-calendar text-[10px]" />
               {formatDate(task.dueDate)}
             </span>
           ) : <span />}

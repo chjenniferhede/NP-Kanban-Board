@@ -132,3 +132,13 @@ textarea:focus,
   0%   { transform: translateX(-100%); }
   100% { transform: translateX(500%); }
 }
+
+.shimmer-sweep {
+  animation: shimmer-sweep 1.6s ease-in-out infinite;
+}
+
+/* ── Input validation error outline ─────────────────────────────── */
+.input-invalid {
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
+}

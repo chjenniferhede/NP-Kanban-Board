@@ -5,9 +5,11 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../../types";
 import { teamAtom } from "../../../hooks/useTeam";
 import { useComments } from "../../../hooks/useComments";
+import { useTasks } from "../../../hooks/useTasks";
 import { resolveAvatarColor } from "../../../lib/avatarColors";
 import Tag from "./tag";
 import CardDetails from "../card-details";
+import DeleteConfirm from "./delete-confirm";
 
 type Props = {
   task: Task;
@@ -17,6 +19,7 @@ export default function TaskCard({ task }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id });
   const [open, setOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -33,6 +36,7 @@ export default function TaskCard({ task }: Props) {
   const p = task.priority ? priorityConfig[task.priority] : null;
   const { getComments } = useComments();
   const commentCount = getComments(task.id).length;
+  const { deleteTask } = useTasks();
   const team = useAtomValue(teamAtom);
   const assignees = team.filter((m) => task.assigneeIds?.includes(m.id));
 
@@ -54,12 +58,20 @@ export default function TaskCard({ task }: Props) {
         {/* Top badge row */}
         <div className="flex items-center justify-between gap-1">
           {p ? <Tag label={p.label} className={p.cls} /> : <span />}
-          {commentCount > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs text-base-content/50 ml-auto">
-              <i className="fa-regular fa-comment" style={{ fontSize: "11px" }} />
-              {commentCount}
-            </span>
-          )}
+          <div className="flex items-center gap-2 ml-auto">
+            {commentCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-base-content/50">
+                <i className="fa-regular fa-comment" style={{ fontSize: "11px" }} />
+                {commentCount}
+              </span>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
+              className="text-base-content/30 hover:text-error transition-colors"
+            >
+              <i className="fa-regular fa-trash-can" style={{ fontSize: "11px" }} />
+            </button>
+          </div>
         </div>
 
         <p className="font-medium text-md leading-snug pl-0.5">{task.title}</p>
@@ -96,6 +108,12 @@ export default function TaskCard({ task }: Props) {
       </div>
 
       {open && <CardDetails task={task} onClose={() => setOpen(false)} />}
+      {confirmDelete && (
+        <DeleteConfirm
+          onConfirm={() => { setConfirmDelete(false); deleteTask(task.id); }}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
     </>
   );
 }

@@ -50,6 +50,7 @@
   --radius-selector: 0.25rem;
   --radius-badge: 0.25rem;
   --base-content: #715f57;
+  --base-100: #fffbf7;
 }
 
 body, * {
@@ -80,9 +81,24 @@ body, * {
   border-color: #9ca3af;
 }
 
+/* ── Modal overlay backdrop ──────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(0 0 0 / 0.6);
+}
+
 @keyframes modal-in {
   from { opacity: 0; transform: scale(0.95) translateY(4px); }
   to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.modal-content {
+  animation: modal-in 0.2s ease-out;
 }
 
 @keyframes shimmer-sweep {

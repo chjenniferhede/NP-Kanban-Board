@@ -140,10 +140,11 @@ export default function CardDetails({ task, onClose }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="modal-overlay"
+      onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-base-100 rounded-md shadow-2xl w-full max-w-5xl flex flex-col" style={{ animation: "modal-in 0.2s ease-out" }}>
+      <div className="modal-content bg-base-100 rounded-md shadow-2xl w-full max-w-5xl flex flex-col">
 
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-base-200">
@@ -231,7 +232,7 @@ export default function CardDetails({ task, onClose }: Props) {
           </div>
 
           {/* Right — details panel */}
-          <div className="w-72 shrink-0 border-l border-base-200 px-6 py-6 flex flex-col gap-4">
+          <div className="w-72 shrink-0 border-l border-base-200 px-6 py-3 flex flex-col gap-4">
 
             {/* Status */}
             <fieldset className="fieldset">
@@ -281,14 +282,12 @@ export default function CardDetails({ task, onClose }: Props) {
                 <i className="fa-solid fa-calendar text-[10px]" />
                 Due date
               </legend>
-              <label className="input input-bordered w-full">
-                <input
-                  type="date"
-                  className="w-full"
-                  value={task.dueDate ?? ""}
-                  onChange={(e) => patch({ dueDate: e.target.value || undefined })}
-                />
-              </label>
+              <input
+                type="date"
+                className="w-full h-8 px-2 rounded border border-base-300 bg-base-100 text-sm"
+                value={task.dueDate ?? ""}
+                onChange={(e) => patch({ dueDate: e.target.value || undefined })}
+              />
             </fieldset>
 
             {/* Start date */}
@@ -306,13 +305,13 @@ export default function CardDetails({ task, onClose }: Props) {
                 <i className="fa-solid fa-user text-[10px]" />
                 Assignee
               </legend>
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="flex flex-wrap gap-2 pt-1 pb-7">
                 <div className="tooltip tooltip-bottom" data-tip="Unassigned">
                   <button
                     onClick={() => patch({ assigneeIds: [] })}
-                    className={`w-7 h-7 rounded-full bg-(--color-avatar-unassigned) flex items-center justify-center transition-all ${!task.assigneeIds?.length ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                    className={`w-9 h-9 rounded-full bg-(--color-avatar-unassigned) flex items-center justify-center transition-all ${!task.assigneeIds?.length ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
                   >
-                    <i className="fa-regular fa-user text-base-content/50" style={{ fontSize: "11px" }} />
+                    <i className="fa-regular fa-user text-base-content/50" style={{ fontSize: "13px" }} />
                   </button>
                 </div>
                 {team.map((m) => {
@@ -322,7 +321,7 @@ export default function CardDetails({ task, onClose }: Props) {
                       <button
                         onClick={() => toggleAssignee(m.id)}
                         style={{ backgroundColor: resolveAvatarColor(m.color) }}
-                        className={`w-7 h-7 rounded-full text-[9px] font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
+                        className={`w-9 h-9 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
                       >
                         {m.initials}
                       </button>

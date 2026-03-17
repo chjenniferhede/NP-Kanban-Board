@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
 import { useToast } from "../toast";
@@ -18,6 +18,7 @@ export default function NewTaskWindow() {
   const [priority, setPriority]       = useState<Task["priority"]>(undefined);
   const [dueDate, setDueDate]         = useState("");
   const [submitting, setSubmitting]   = useState(false);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const [titleError, setTitleError]   = useState(false);
 
   function reset() {
@@ -25,6 +26,7 @@ export default function NewTaskWindow() {
     setDescription("");
     setPriority(undefined);
     setDueDate("");
+    if (dateInputRef.current) dateInputRef.current.value = "";
     setTitleError(false);
   }
 
@@ -110,14 +112,13 @@ export default function NewTaskWindow() {
 
           <fieldset className="fieldset flex-1">
             <legend className="fieldset-legend">Due date</legend>
-            <label className="input input-bordered w-full">
-              <input
-                type="date"
-                className="w-full"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
-            </label>
+            <input
+              ref={dateInputRef}
+              type="date"
+              className="w-full h-10 px-3 rounded border border-base-300 bg-base-100 text-sm"
+              defaultValue=""
+              onChange={(e) => setDueDate(e.target.value)}
+            />
           </fieldset>
         </div>
 

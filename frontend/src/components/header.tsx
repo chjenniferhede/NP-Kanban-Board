@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAtom } from "jotai";
+import logo from "../assets/vite.svg";
 import { useMe } from "../hooks/useMe";
 import { useTeam } from "../hooks/useTeam";
 import { AVATAR_COLORS, resolveAvatarColor } from "../lib/avatarColors";
@@ -45,10 +46,11 @@ export default function Header() {
   return (
     <header className="navbar bg-base-100 border-b border-base-300 px-6 min-h-20">
       {/* Left — sidebar toggle (< lg only) */}
-      <div className="flex-1 flex items-center">
+      <div className="flex-1 flex items-center gap-6">
         <label htmlFor="sidebar-drawer" className="btn btn-ghost btn-sm btn-square lg:hidden" aria-label="Open sidebar">
           <i className="fa-solid fa-bars text-base" />
         </label>
+        <img src={logo} alt="Logo" className="w-7 h-7" />
       </div>
 
       {/* Center — search bar */}

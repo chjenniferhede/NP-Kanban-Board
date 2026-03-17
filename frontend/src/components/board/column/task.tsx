@@ -70,10 +70,10 @@ export default function TaskCard({ task }: Props) {
             )}
             <button
               onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
-              className="text-base-content/30 hover:text-error transition-colors disabled:opacity-30 disabled:pointer-events-none"
+              className="text-base-content/30 hover:text-error hover:bg-error/10 rounded px-1.5 transition-colors disabled:opacity-30 disabled:pointer-events-none"
               disabled={!!fetchError}
             >
-              <i className="fa-regular fa-trash-can text-[11px]" />
+              <i className="fa-regular fa-trash-can text-[9px]" />
             </button>
           </div>
         </div>

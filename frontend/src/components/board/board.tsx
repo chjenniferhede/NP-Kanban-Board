@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -57,12 +57,6 @@ const collisionDetection: CollisionDetection = (args) => {
 
 export default function Board() {
   const [tasks, setTasks] = useAtom(tasksAtom);
-  const pointerYRef = useRef(0);
-  useEffect(() => {
-    const handler = (e: PointerEvent) => { pointerYRef.current = e.clientY; };
-    window.addEventListener("pointermove", handler);
-    return () => window.removeEventListener("pointermove", handler);
-  }, []);
   const { fetchTasks, updateTask, loading, fetchError } = useTasks();
   useSeedData(loading, fetchTasks);
   const { fetchAllComments } = useComments();
@@ -92,9 +86,14 @@ export default function Board() {
     const overId   = over.id as string;
     if (activeId === overId) return;
 
-    // Snapshot before setTasks: the functional updater runs asynchronously, so
-    // pointerYRef.current may have advanced by the time it executes.
-    const pointerY = pointerYRef.current;
+    // Use center-to-center comparison so grab offset doesn't affect insertAfter.
+    // Capture outside the updater to avoid the ref being mutated before it runs.
+    const draggingRect = active.rect.current.translated;
+    const draggingCenter = draggingRect
+      ? draggingRect.top + draggingRect.height / 2
+      : active.rect.current.initial
+        ? active.rect.current.initial.top + active.rect.current.initial.height / 2
+        : 0;
 
     setTasks((prev) => {
       const activeIndex = prev.findIndex((t) => t.id === activeId);
@@ -129,7 +128,7 @@ export default function Board() {
         return arrayMove(prev, activeIndex, overIndex);
       }
 
-      const insertAfter = pointerY > over.rect.top + over.rect.height / 2;
+      const insertAfter = draggingCenter > over.rect.top + over.rect.height / 2;
       const without = prev.filter((t) => t.id !== activeId);
       const idx = without.findIndex((t) => t.id === overId);
       without.splice(insertAfter ? idx + 1 : idx, 0, { ...draggedTask, status: overTask.status });

@@ -15,7 +15,7 @@ type Props = {
 export default function Bar({ priority, assignee, team, onPriorityChange, onAssigneeChange, disabled }: Props) {
   const assigneeOptions = [
     { value: "", label: "All assignee" },
-    { value: "__unassigned__", label: "Unassigned", initials: "–", color: "#E5E7EB" },
+    { value: "__unassigned__", label: "Unassigned", icon: "fa-regular fa-user", color: "var(--color-avatar-unassigned)" },
     ...team.map((m) => ({ value: m.id, label: m.name, initials: m.initials, color: resolveAvatarColor(m.color) })),
   ];
 

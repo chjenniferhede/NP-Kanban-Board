@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export type Option = { value: string; label: string; initials?: string; color?: string };
+export type Option = { value: string; label: string; initials?: string; color?: string; icon?: string };
 
 type Props = {
   label: string;
@@ -11,13 +11,13 @@ type Props = {
   menuClassName?: string;
 };
 
-function Avatar({ initials, color }: { initials: string; color: string }) {
+function Avatar({ initials, color, icon }: { initials?: string; color: string; icon?: string }) {
   return (
     <span
       className="inline-flex items-center justify-center rounded-full text-xs font-semibold shrink-0"
       style={{ backgroundColor: color, width: 22, height: 22 }}
     >
-      {initials}
+      {icon ? <i className={`${icon} text-base-content/40 text-[11px]`} /> : initials}
     </span>
   );
 }
@@ -53,8 +53,8 @@ export default function Dropdown({
     <details ref={ref} className="dropdown w-full">
       <summary className={`flex items-center justify-between gap-2 cursor-pointer list-none ${buttonClassName}`}>
         <span className="flex items-center gap-2 truncate min-w-0">
-          {selectedOption?.initials && selectedOption?.color && (
-            <Avatar initials={selectedOption.initials} color={selectedOption.color} />
+          {selectedOption?.color && (selectedOption.initials || selectedOption.icon) && (
+            <Avatar initials={selectedOption.initials} color={selectedOption.color} icon={selectedOption.icon} />
           )}
           <span className="truncate">{selectedLabel}</span>
         </span>
@@ -69,7 +69,7 @@ export default function Dropdown({
               className={value === o.value ? "active" : ""}
               onClick={() => select(o.value)}
             >
-              {o.initials && o.color && <Avatar initials={o.initials} color={o.color} />}
+              {o.color && (o.initials || o.icon) && <Avatar initials={o.initials} color={o.color} icon={o.icon} />}
               {o.label}
             </a>
           </li>

@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAtomValue } from "jotai";
-import type { Task, Comment } from "../../types";
+import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
 import { teamAtom } from "../../hooks/useTeam";
 import { resolveAvatarColor } from "../../lib/avatarColors";
 import { useToast } from "../toast";
 import { sessionAtom } from "../../hooks/useAuth";
+import { useComments } from "../../hooks/useComments";
 import Tag from "./column/tag";
 import Dropdown from "../dropdown";
 
@@ -86,10 +87,11 @@ function EditableText({
 
 export default function CardDetails({ task, onClose }: Props) {
   const { updateTask } = useTasks();
+  const { getComments, addComment } = useComments();
   const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
   const toast = useToast();
-  const [comments, setComments] = useState<Comment[]>([]);
+  const comments = getComments(task.id);
   const [commentDraft, setCommentDraft] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
 
@@ -99,12 +101,6 @@ export default function CardDetails({ task, onClose }: Props) {
       ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
     };
   }
-
-  useEffect(() => {
-    fetch(`${API}/api/tasks/${task.id}/comments`, { headers: authHeaders() })
-      .then((r) => r.ok ? r.json() : [])
-      .then((data: Comment[]) => setComments(data));
-  }, [task.id]);
 
   async function patch(fields: Partial<Task>) {
     try {
@@ -124,8 +120,8 @@ export default function CardDetails({ task, onClose }: Props) {
         body: JSON.stringify({ text: commentDraft.trim() }),
       });
       if (!res.ok) throw new Error();
-      const comment: Comment = await res.json();
-      setComments((prev) => [...prev, comment]);
+      const comment = await res.json();
+      addComment(comment);
       setCommentDraft("");
     } catch {
       toast("Failed to post comment.", "error");
@@ -147,7 +143,7 @@ export default function CardDetails({ task, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-base-100 rounded-md shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden" style={{ animation: "modal-in 0.2s ease-out" }}>
+      <div className="bg-base-100 rounded-md shadow-2xl w-full max-w-5xl flex flex-col" style={{ animation: "modal-in 0.2s ease-out" }}>
 
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-base-200">
@@ -161,10 +157,10 @@ export default function CardDetails({ task, onClose }: Props) {
         </div>
 
         {/* Body */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex">
 
           {/* Left — main content */}
-          <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col gap-6">
+          <div className="flex-1 px-8 py-6 flex flex-col gap-7">
 
             {/* Title */}
             <EditableText
@@ -176,14 +172,14 @@ export default function CardDetails({ task, onClose }: Props) {
 
             {/* Priority tag */}
             {p && (
-              <div className="flex gap-1">
+              <div className="flex gap-1 -mt-3">
                 <Tag label={p.label} className={p.cls} />
               </div>
             )}
 
             {/* Description */}
-            <div>
-              <p className="text-xs font-semibold text-base-content/40 uppercase tracking-wide mb-2">Description</p>
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Description</legend>
               <EditableText
                 value={task.description ?? ""}
                 onSave={(v) => patch({ description: v })}
@@ -191,11 +187,11 @@ export default function CardDetails({ task, onClose }: Props) {
                 placeholder="Add a description..."
                 multiline
               />
-            </div>
+            </fieldset>
 
             {/* Activity */}
-            <div>
-              <p className="text-xs font-semibold text-base-content/40 uppercase tracking-wide mb-3">Activity</p>
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Activity</legend>
 
               <div className="flex flex-col gap-2 mb-4">
                 {comments.length === 0 && (
@@ -218,33 +214,36 @@ export default function CardDetails({ task, onClose }: Props) {
 
               <div className="flex gap-2">
                 <input
-                  className="input input-bordered input-sm flex-1 text-sm"
+                  className="input input-bordered flex-1"
                   placeholder="Add a comment..."
                   value={commentDraft}
                   onChange={(e) => setCommentDraft(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submitComment()}
                 />
-                <button className="btn btn-action btn-sm" onClick={submitComment} disabled={submittingComment}>
+                <button className="btn btn-action" onClick={submitComment} disabled={submittingComment}>
                   {submittingComment
                     ? <span className="loading loading-spinner loading-xs" />
                     : <i className="fa-solid fa-paper-plane" />}
                 </button>
               </div>
-            </div>
+            </fieldset>
 
           </div>
 
           {/* Right — details panel */}
-          <div className="w-64 shrink-0 border-l border-base-200 px-5 py-6 flex flex-col gap-4 overflow-y-auto">
-            <p className="text-xs font-semibold text-base-content/40 uppercase tracking-wide">Details</p>
+          <div className="w-72 shrink-0 border-l border-base-200 px-6 py-6 flex flex-col gap-4">
 
             {/* Status */}
-            <DetailRow icon="fa-circle-half-stroke" label="Status">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend flex items-center gap-1.5">
+                <i className="fa-solid fa-circle-half-stroke text-[10px]" />
+                Status
+              </legend>
               <Dropdown
                 label="Status"
                 value={task.status}
                 onChange={(v) => patch({ status: v as Task["status"] })}
-                buttonClassName="btn btn-filter btn-xs w-full text-xs"
+                buttonClassName="btn btn-filter btn-md w-full"
                 menuClassName="w-full"
                 options={[
                   { value: "todo",        label: "To Do" },
@@ -253,15 +252,19 @@ export default function CardDetails({ task, onClose }: Props) {
                   { value: "done",        label: "Done" },
                 ]}
               />
-            </DetailRow>
+            </fieldset>
 
             {/* Priority */}
-            <DetailRow icon="fa-flag" label="Priority">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend flex items-center gap-1.5">
+                <i className="fa-solid fa-flag text-[10px]" />
+                Priority
+              </legend>
               <Dropdown
                 label="None"
                 value={task.priority ?? ""}
                 onChange={(v) => patch({ priority: (v as Task["priority"]) || undefined })}
-                buttonClassName="btn btn-filter btn-xs w-full text-xs"
+                buttonClassName="btn btn-filter btn-md w-full"
                 menuClassName="w-full"
                 options={[
                   { value: "",       label: "None" },
@@ -270,11 +273,15 @@ export default function CardDetails({ task, onClose }: Props) {
                   { value: "high",   label: "High" },
                 ]}
               />
-            </DetailRow>
+            </fieldset>
 
             {/* Due date */}
-            <DetailRow icon="fa-calendar" label="Due date">
-              <label className="input input-bordered input-xs w-full">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend flex items-center gap-1.5">
+                <i className="fa-solid fa-calendar text-[10px]" />
+                Due date
+              </legend>
+              <label className="input input-bordered w-full">
                 <input
                   type="date"
                   className="w-full"
@@ -282,15 +289,23 @@ export default function CardDetails({ task, onClose }: Props) {
                   onChange={(e) => patch({ dueDate: e.target.value || undefined })}
                 />
               </label>
-            </DetailRow>
+            </fieldset>
 
-            {/* Start date — display only, not in schema */}
-            <DetailRow icon="fa-calendar-plus" label="Start date">
-              <span className="text-xs text-base-content/30">None</span>
-            </DetailRow>
+            {/* Start date */}
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend flex items-center gap-1.5">
+                <i className="fa-solid fa-calendar-plus text-[10px]" />
+                Start date
+              </legend>
+              <span className="text-sm text-base-content/30">None</span>
+            </fieldset>
 
             {/* Assignee */}
-            <DetailRow icon="fa-user" label="Assignee">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend flex items-center gap-1.5">
+                <i className="fa-solid fa-user text-[10px]" />
+                Assignee
+              </legend>
               <div className="flex flex-wrap gap-1.5 pt-1">
                 <div className="tooltip tooltip-bottom" data-tip="Unassigned">
                   <button
@@ -315,24 +330,13 @@ export default function CardDetails({ task, onClose }: Props) {
                   );
                 })}
               </div>
-            </DetailRow>
+            </fieldset>
+
           </div>
 
         </div>
       </div>
     </div>,
     document.body
-  );
-}
-
-function DetailRow({ icon, label, children }: { icon: string; label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-1.5 text-xs text-base-content/40">
-        <i className={`fa-solid ${icon} text-[10px]`} />
-        {label}
-      </div>
-      {children}
-    </div>
   );
 }

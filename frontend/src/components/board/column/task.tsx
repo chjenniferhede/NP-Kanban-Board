@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../../types";
 import { teamAtom } from "../../../hooks/useTeam";
+import { useComments } from "../../../hooks/useComments";
 import { resolveAvatarColor } from "../../../lib/avatarColors";
 import Tag from "./tag";
 import CardDetails from "../card-details";
@@ -30,6 +31,8 @@ export default function TaskCard({ task }: Props) {
   };
 
   const p = task.priority ? priorityConfig[task.priority] : null;
+  const { getComments } = useComments();
+  const commentCount = getComments(task.id).length;
   const team = useAtomValue(teamAtom);
   const assignees = team.filter((m) => task.assigneeIds?.includes(m.id));
 
@@ -49,11 +52,15 @@ export default function TaskCard({ task }: Props) {
         className="bg-(--color-bg-app) shadow-sm rounded-md p-3 flex flex-col gap-2 cursor-pointer touch-none w-full transition-all duration-150 hover:-translate-y-0.3 hover:shadow-md"
       >
         {/* Top badge row */}
-        {p && (
-          <div className="flex flex-wrap gap-1">
-            <Tag label={p.label} className={p.cls} />
-          </div>
-        )}
+        <div className="flex items-center justify-between gap-1">
+          {p ? <Tag label={p.label} className={p.cls} /> : <span />}
+          {commentCount > 0 && (
+            <span className="inline-flex items-center gap-1 text-xs text-base-content/50 ml-auto">
+              <i className="fa-regular fa-comment" style={{ fontSize: "11px" }} />
+              {commentCount}
+            </span>
+          )}
+        </div>
 
         <p className="font-medium text-md leading-snug pl-0.5">{task.title}</p>
 

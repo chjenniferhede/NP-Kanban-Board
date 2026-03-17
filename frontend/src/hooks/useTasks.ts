@@ -71,5 +71,14 @@ export function useTasks() {
     return updated;
   }
 
-  return { tasks, loading, fetchError, fetchTasks, createTask, updateTask };
+  async function deleteTask(id: string) {
+    const res = await fetch(`${API}/api/tasks/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to delete task (${res.status})`);
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+  }
+
+  return { tasks, loading, fetchError, fetchTasks, createTask, updateTask, deleteTask };
 }

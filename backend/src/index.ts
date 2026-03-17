@@ -5,6 +5,7 @@ import cors from "cors";
 import taskRouter from "./routes/task.js";
 import teamRouter from "./routes/team.js";
 import commentRouter from "./routes/comment.js";
+import allCommentsRouter from "./routes/allComments.js";
 import { requireAuth } from "./middleware/auth.js";
 
 // Load environment variables from .env
@@ -26,6 +27,7 @@ app.use(express.json());
 // --- Routes ---
 app.use("/api/tasks", requireAuth, taskRouter);
 app.use("/api/tasks/:taskId/comments", requireAuth, commentRouter);
+app.use("/api/comments", requireAuth, allCommentsRouter);
 app.use("/api/team", requireAuth, teamRouter);
 
 // Health check

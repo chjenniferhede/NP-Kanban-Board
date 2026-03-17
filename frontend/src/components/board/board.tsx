@@ -16,6 +16,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { useAtom, useAtomValue } from "jotai";
 import type { Task } from "../../types";
 import { tasksAtom, useTasks, fetchErrorCodeAtom } from "../../hooks/useTasks";
+import { useComments } from "../../hooks/useComments";
 import { sessionAtom } from "../../hooks/useAuth";
 import { teamAtom } from "../../hooks/useTeam";
 import Column from "./column/column";
@@ -56,6 +57,7 @@ const collisionDetection: CollisionDetection = (args) => {
 export default function Board() {
   const [tasks, setTasks] = useAtom(tasksAtom);
   const { fetchTasks, updateTask, loading, fetchError } = useTasks();
+  const { fetchAllComments } = useComments();
   const fetchErrorCode = useAtomValue(fetchErrorCodeAtom);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -66,7 +68,7 @@ export default function Board() {
   const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
   const toast = useToast();
-  useEffect(() => { if (session) fetchTasks(); }, [session?.userId]);
+  useEffect(() => { if (session) { fetchTasks(); fetchAllComments(); } }, [session?.userId]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })

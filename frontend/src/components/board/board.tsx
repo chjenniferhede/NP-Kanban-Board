@@ -26,10 +26,10 @@ import { useToast } from "../toast";
 
 
 const COLUMNS = [
-  { key: "todo",        label: "To Do",       accent: "bg-(--color-status-todo)" },
-  { key: "in_progress", label: "In Progress", accent: "bg-(--color-status-in-progress)" },
-  { key: "in_review",   label: "In Review",   accent: "bg-(--color-status-in-review)" },
-  { key: "done",        label: "Done",        accent: "bg-(--color-status-done)" },
+  { key: "todo",        label: "To Do",       accent: "bg-(--color-status-todo)",        icon: "fa-circle-dot" },
+  { key: "in_progress", label: "In Progress", accent: "bg-(--color-status-in-progress)", icon: "fa-circle-half-stroke" },
+  { key: "in_review",   label: "In Review",   accent: "bg-(--color-status-in-review)",   icon: "fa-magnifying-glass" },
+  { key: "done",        label: "Done",        accent: "bg-(--color-status-done)",        icon: "fa-circle-check" },
 ] as const;
 
 const collisionDetection: CollisionDetection = (args) => {
@@ -203,7 +203,7 @@ export default function Board() {
           onDragEnd={onDragEnd}
         >
           <div className="flex gap-3 flex-1 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
-            {COLUMNS.map(({ key, label, accent }) => {
+            {COLUMNS.map(({ key, label, accent, icon }) => {
               const columnTasks = tasks.filter((t) => t.status === key);
               const displayed = columnTasks.filter((t) => {
                 if (filterPriority && t.priority !== filterPriority) return false;
@@ -216,6 +216,7 @@ export default function Board() {
                     columnKey={key}
                     title={label}
                     accent={accent}
+                    icon={icon}
                     tasks={displayed}
                     totalCount={columnTasks.length}
                   />

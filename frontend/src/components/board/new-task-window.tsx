@@ -68,7 +68,8 @@ export default function NewTaskWindow() {
           <input
             type="text"
             placeholder="Task title"
-            className={`input input-bordered w-full ${titleError ? "input-error" : ""}`}
+            className="input input-bordered w-full"
+            style={titleError ? { outline: "2px solid var(--color-error)", outlineOffset: "2px" } : undefined}
             value={title}
             onChange={(e) => { setTitle(e.target.value); if (titleError) setTitleError(false); }}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
@@ -109,12 +110,14 @@ export default function NewTaskWindow() {
 
           <fieldset className="fieldset flex-1">
             <legend className="fieldset-legend">Due date</legend>
-            <input
-              type="date"
-              className="input input-bordered w-full"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-            />
+            <label className="input input-bordered w-full">
+              <input
+                type="date"
+                className="w-full"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
+            </label>
           </fieldset>
         </div>
 

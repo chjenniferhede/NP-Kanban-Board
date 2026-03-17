@@ -274,12 +274,14 @@ export default function CardDetails({ task, onClose }: Props) {
 
             {/* Due date */}
             <DetailRow icon="fa-calendar" label="Due date">
-              <input
-                type="date"
-                className="input input-bordered input-xs w-full"
-                value={task.dueDate ?? ""}
-                onChange={(e) => patch({ dueDate: e.target.value || undefined })}
-              />
+              <label className="input input-bordered input-xs w-full">
+                <input
+                  type="date"
+                  className="w-full"
+                  value={task.dueDate ?? ""}
+                  onChange={(e) => patch({ dueDate: e.target.value || undefined })}
+                />
+              </label>
             </DetailRow>
 
             {/* Start date — display only, not in schema */}

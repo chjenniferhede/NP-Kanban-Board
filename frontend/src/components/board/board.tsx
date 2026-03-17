@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -56,6 +56,12 @@ const collisionDetection: CollisionDetection = (args) => {
 
 export default function Board() {
   const [tasks, setTasks] = useAtom(tasksAtom);
+  const pointerYRef = useRef(0);
+  useEffect(() => {
+    const handler = (e: PointerEvent) => { pointerYRef.current = e.clientY; };
+    window.addEventListener("pointermove", handler);
+    return () => window.removeEventListener("pointermove", handler);
+  }, []);
   const { fetchTasks, updateTask, loading, fetchError } = useTasks();
   const { fetchAllComments } = useComments();
   const fetchErrorCode = useAtomValue(fetchErrorCodeAtom);
@@ -104,24 +110,24 @@ export default function Board() {
       const overIndex = prev.findIndex((t) => t.id === overId);
       if (overIndex === -1) return prev;
 
-      const activeTask = prev[activeIndex];
-      const overTask   = prev[overIndex];
+      const draggedTask = prev[activeIndex];
+      const overTask    = prev[overIndex];
 
-      if (activeTask.status !== overTask.status) {
-        // Cross-column: arrayMove gives wrong results because the active card's
-        // flat-array index may be on either side of overIndex depending on column order.
-        // Instead, remove and splice explicitly based on overlay center vs target center.
-        const overlayRect = active.rect.current.translated;
-        const insertAfter = overlayRect
-          ? overlayRect.top + overlayRect.height / 2 > over.rect.top + over.rect.height / 2
-          : false;
-        const without = prev.filter((t) => t.id !== activeId);
-        const idx = without.findIndex((t) => t.id === overId);
-        without.splice(insertAfter ? idx + 1 : idx, 0, { ...activeTask, status: overTask.status });
-        return without;
+      // Use arrayMove only when the card is still in its origin column.
+      // Once it has been moved into a new column (status updated by a prior
+      // onDragOver), another arrayMove call would incorrectly swap it past
+      // the card it just landed beside. The splice path is pointer-accurate
+      // and idempotent, so it handles both cross-column and within-new-column
+      // reordering correctly.
+      if (draggedTask.status === overTask.status && draggedTask.status === activeTask?.status) {
+        return arrayMove(prev, activeIndex, overIndex);
       }
 
-      return arrayMove(prev, activeIndex, overIndex);
+      const insertAfter = pointerYRef.current > over.rect.top + over.rect.height / 2;
+      const without = prev.filter((t) => t.id !== activeId);
+      const idx = without.findIndex((t) => t.id === overId);
+      without.splice(insertAfter ? idx + 1 : idx, 0, { ...draggedTask, status: overTask.status });
+      return without;
     });
   }
 

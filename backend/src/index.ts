@@ -56,9 +56,11 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-// --- Start server ---
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// --- Start server if not in production ---
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
 
 export default app;

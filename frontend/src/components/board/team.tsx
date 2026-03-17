@@ -55,13 +55,13 @@ export default function Team() {
     <>
       <div className="flex items-center gap-3">
         <div className="flex -space-x-2">
-          <div className="tooltip tooltip-bottom" data-tip="Unassigned">
+          <div className="tooltip tooltip-left" data-tip="Unassigned">
             <div className="bg-(--color-avatar-unassigned) rounded-full w-8 h-8 flex items-center justify-center ring-2 ring-base-100">
               <i className="fa-regular fa-user text-base-content/40 text-[13px]" />
             </div>
           </div>
           {team.map((member) => (
-            <div key={member.id} className="tooltip tooltip-bottom" data-tip={member.name}>
+            <div key={member.id} className="tooltip tooltip-left" data-tip={member.name}>
               <div style={{ backgroundColor: resolveAvatarColor(member.color) }} className="rounded-full w-8 h-8 flex items-center justify-center text-xs font-semibold ring-2 ring-base-100">
                 {member.initials}
               </div>
@@ -70,7 +70,7 @@ export default function Team() {
         </div>
 
         <button
-          className="btn btn-xs btn-outline btn-circle"
+          className="btn btn-outline btn-circle w-8 h-8 min-h-0"
           title="Add teammate"
           onClick={() => (document.getElementById("add-teammate-modal") as HTMLDialogElement).showModal()}
         >

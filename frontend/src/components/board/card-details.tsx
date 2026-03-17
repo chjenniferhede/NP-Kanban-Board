@@ -3,9 +3,8 @@ import { createPortal } from "react-dom";
 import { useAtomValue } from "jotai";
 import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
-import { teamAtom } from "../../hooks/useTeam";
-import { resolveAvatarColor } from "../../lib/avatarColors";
 import { useToast } from "../toast";
+import AssigneeSelection from "./assignee-selection";
 import { sessionAtom } from "../../hooks/useAuth";
 import { useComments } from "../../hooks/useComments";
 import Tag from "./column/tag";
@@ -42,7 +41,14 @@ function EditableText({
   const [draft, setDraft] = useState(value);
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
 
-  useEffect(() => { if (editing) ref.current?.focus(); }, [editing]);
+  useEffect(() => {
+    if (editing && ref.current) {
+      const el = ref.current;
+      el.focus();
+      const len = el.value.length;
+      el.setSelectionRange(len, len);
+    }
+  }, [editing]);
 
   function commit() {
     setEditing(false);
@@ -88,7 +94,6 @@ function EditableText({
 export default function CardDetails({ task, onClose }: Props) {
   const { updateTask } = useTasks();
   const { getComments, addComment } = useComments();
-  const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
   const toast = useToast();
   const comments = getComments(task.id);
@@ -128,12 +133,6 @@ export default function CardDetails({ task, onClose }: Props) {
     } finally {
       setSubmittingComment(false);
     }
-  }
-
-  function toggleAssignee(memberId: string) {
-    const ids = task.assigneeIds ?? [];
-    const next = ids.includes(memberId) ? ids.filter((id) => id !== memberId) : [...ids, memberId];
-    patch({ assigneeIds: next });
   }
 
   const p = task.priority ? PRIORITY_CONFIG[task.priority] : null;
@@ -300,36 +299,10 @@ export default function CardDetails({ task, onClose }: Props) {
             </fieldset>
 
             {/* Assignee */}
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend flex items-center gap-1.5">
-                <i className="fa-solid fa-user text-[10px]" />
-                Assignee
-              </legend>
-              <div className="flex flex-wrap gap-2 pt-1 pb-7">
-                <div className="tooltip tooltip-bottom" data-tip="Unassigned">
-                  <button
-                    onClick={() => patch({ assigneeIds: [] })}
-                    className={`w-9 h-9 rounded-full bg-(--color-avatar-unassigned) flex items-center justify-center transition-all ${!task.assigneeIds?.length ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
-                  >
-                    <i className="fa-regular fa-user text-base-content/50" style={{ fontSize: "13px" }} />
-                  </button>
-                </div>
-                {team.map((m) => {
-                  const selected = task.assigneeIds?.includes(m.id);
-                  return (
-                    <div key={m.id} className="tooltip tooltip-bottom" data-tip={m.name}>
-                      <button
-                        onClick={() => toggleAssignee(m.id)}
-                        style={{ backgroundColor: resolveAvatarColor(m.color) }}
-                        className={`w-9 h-9 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${selected ? "ring-2 ring-primary ring-offset-1" : "opacity-50 hover:opacity-100"}`}
-                      >
-                        {m.initials}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </fieldset>
+            <AssigneeSelection
+              assigneeIds={task.assigneeIds ?? []}
+              onChange={(ids) => patch({ assigneeIds: ids })}
+            />
 
           </div>
 

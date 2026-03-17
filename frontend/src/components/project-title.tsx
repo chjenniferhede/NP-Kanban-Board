@@ -54,7 +54,7 @@ export default function ProjectTitle() {
               if (e.key === "Enter") commit();
               if (e.key === "Escape") cancel();
             }}
-            className="absolute inset-0 text-2xl font-bold bg-transparent border-b-2 border-primary outline-none w-full"
+            className="absolute inset-0 text-2xl font-bold bg-transparent border-none outline-none w-full"
           />
         ) : (
           <h1 className="absolute inset-0 text-2xl font-bold">{title}</h1>

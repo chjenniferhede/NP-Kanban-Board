@@ -5,6 +5,7 @@ import { sessionAtom } from "./useAuth";
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 export const tasksAtom = atom<Task[]>([]);
+export const searchAtom = atom("");
 const loadingAtom = atom(false);
 export const fetchErrorAtom = atom<string | null>(null);
 export const fetchErrorCodeAtom = atom<number | null>(null);

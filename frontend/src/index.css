@@ -57,6 +57,24 @@ body, * {
   color: #715f57;
 }
 
+/* ── Strip inner input border inside daisyUI compound .input ──────── */
+.input input,
+.input input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+/* ── Focus ring (shadow, no layout shift) ────────────────────────── */
+input:focus,
+textarea:focus,
+.input:focus-within,
+.textarea:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgb(113 95 87 / 0.4) !important;
+}
+
 /* ── Semantic button classes ─────────────────────────────────────── */
 
 /* Primary / confirm / submit actions */

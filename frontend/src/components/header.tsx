@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useAtom } from "jotai";
 import { useMe } from "../hooks/useMe";
 import { useTeam } from "../hooks/useTeam";
 import { AVATAR_COLORS, resolveAvatarColor } from "../lib/avatarColors";
 import { useToast } from "./toast";
+import { searchAtom } from "../hooks/useTasks";
 
 const MODAL_ID = "me-profile-modal";
 
 export default function Header() {
+  const [search, setSearch] = useAtom(searchAtom);
   const { me, updateMe } = useMe();
   const { updateMember } = useTeam();
   const toast = useToast();
@@ -54,7 +57,7 @@ export default function Header() {
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 opacity-40" viewBox="0 0 24 24" fill="currentColor">
             <path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z" />
           </svg>
-          <input type="search" placeholder="Type something to search" className="grow" />
+          <input type="search" placeholder="Type something to search" className="grow" value={search} onChange={(e) => setSearch(e.target.value)} />
         </label>
       </div>
 

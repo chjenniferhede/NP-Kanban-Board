@@ -15,7 +15,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import { useAtom, useAtomValue } from "jotai";
 import type { Task } from "../../types";
-import { tasksAtom, useTasks, fetchErrorCodeAtom } from "../../hooks/useTasks";
+import { tasksAtom, useTasks, fetchErrorCodeAtom, searchAtom } from "../../hooks/useTasks";
 import { useComments } from "../../hooks/useComments";
 import { sessionAtom } from "../../hooks/useAuth";
 import { teamAtom } from "../../hooks/useTeam";
@@ -65,6 +65,7 @@ export default function Board() {
   const [filterAssignee, setFilterAssignee] = useState("");
   const [filterLabel, setFilterLabel]       = useState("");
 
+  const search = useAtomValue(searchAtom);
   const team = useAtomValue(teamAtom);
   const session = useAtomValue(sessionAtom);
   const toast = useToast();
@@ -207,9 +208,11 @@ export default function Board() {
           <div className="flex gap-3 flex-1 pb-4 overflow-y-hidden max-lg:overflow-x-auto max-lg:snap-x max-lg:snap-mandatory">
             {COLUMNS.map(({ key, label, accent, icon }) => {
               const columnTasks = tasks.filter((t) => t.status === key);
+              const q = search.trim().toLowerCase();
               const displayed = columnTasks.filter((t) => {
                 if (filterPriority && t.priority !== filterPriority) return false;
                 if (filterAssignee && !t.assigneeIds?.includes(filterAssignee)) return false;
+                if (q && !`${t.title} ${t.description ?? ""}`.toLowerCase().includes(q)) return false;
                 return true;
               });
               return (

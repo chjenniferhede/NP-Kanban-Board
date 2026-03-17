@@ -62,6 +62,8 @@ export default function Stats() {
             />
           ) : null
         )}
+        <text x={CX} y={CY - 6} textAnchor="middle" dominantBaseline="middle" fontSize="13" fontWeight="600" fill="currentColor">{total}</text>
+        <text x={CX} y={CY + 9} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="currentColor" opacity="0.5">tasks</text>
       </svg>
 
       <div className="flex flex-col gap-1.5 w-full">

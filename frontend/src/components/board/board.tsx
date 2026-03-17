@@ -92,6 +92,10 @@ export default function Board() {
     const overId   = over.id as string;
     if (activeId === overId) return;
 
+    // Snapshot before setTasks: the functional updater runs asynchronously, so
+    // pointerYRef.current may have advanced by the time it executes.
+    const pointerY = pointerYRef.current;
+
     setTasks((prev) => {
       const activeIndex = prev.findIndex((t) => t.id === activeId);
       if (activeIndex === -1) return prev;
@@ -125,7 +129,7 @@ export default function Board() {
         return arrayMove(prev, activeIndex, overIndex);
       }
 
-      const insertAfter = pointerYRef.current > over.rect.top + over.rect.height / 2;
+      const insertAfter = pointerY > over.rect.top + over.rect.height / 2;
       const without = prev.filter((t) => t.id !== activeId);
       const idx = without.findIndex((t) => t.id === overId);
       without.splice(insertAfter ? idx + 1 : idx, 0, { ...draggedTask, status: overTask.status });

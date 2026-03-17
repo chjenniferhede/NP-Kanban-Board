@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { useTeam } from "../../hooks/useTeam";
 import { sessionAtom } from "../../hooks/useAuth";
 import { AVATAR_COLORS, resolveAvatarColor } from "../../lib/avatarColors";
-import { useToast } from "../toast";
+import { useToast } from "../ui/toast";
 
 export default function Team() {
   const { team, fetchTeam, createMember, deleteMember } = useTeam();

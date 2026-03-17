@@ -7,10 +7,10 @@ import { teamAtom } from "../../../hooks/useTeam";
 import { useComments } from "../../../hooks/useComments";
 import { useTasks, fetchErrorAtom } from "../../../hooks/useTasks";
 import { resolveAvatarColor } from "../../../lib/avatarColors";
-import { useToast } from "../../toast";
+import { useToast } from "../../ui/toast";
 import Tag from "./tag";
-import CardDetails from "../card-details";
-import DeleteConfirm from "./delete-confirm";
+import CardDetails from "../task-details";
+import DeleteConfirm from "./delete-task-dialog";
 
 type Props = {
   task: Task;

@@ -5,7 +5,7 @@ import Sidebar from "./components/sidebar/sidebar";
 import ProjectTitle from "./components/project-title";
 import Board from "./components/board/board";
 import Team from "./components/board/team";
-import { Toaster, useToast } from "./components/toast";
+import { Toaster, useToast } from "./components/ui/toast";
 import { useAuth, authErrorAtom } from "./hooks/useAuth";
 
 const DRAWER_ID = "sidebar-drawer";

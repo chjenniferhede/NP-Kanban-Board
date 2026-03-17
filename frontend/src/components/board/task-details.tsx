@@ -3,12 +3,12 @@ import { createPortal } from "react-dom";
 import { useAtomValue } from "jotai";
 import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
-import { useToast } from "../toast";
+import { useToast } from "../ui/toast";
 import AssigneeSelection from "./assignee-selection";
 import { sessionAtom } from "../../hooks/useAuth";
 import { useComments } from "../../hooks/useComments";
 import Tag from "./column/tag";
-import Dropdown from "../dropdown";
+import Dropdown from "../ui/dropdown";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 

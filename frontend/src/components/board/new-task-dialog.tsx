@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import type { Task } from "../../types";
 import { useTasks } from "../../hooks/useTasks";
-import { useToast } from "../toast";
-import Dropdown from "../dropdown";
+import { useToast } from "../ui/toast";
+import Dropdown from "../ui/dropdown";
 import AssigneeSelection from "./assignee-selection";
 
 const MODAL_ID = "new-task-modal";

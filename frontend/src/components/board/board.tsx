@@ -21,9 +21,9 @@ import { sessionAtom } from "../../hooks/useAuth";
 import { teamAtom } from "../../hooks/useTeam";
 import Column from "./column/column";
 import TaskCard from "./column/task";
-import NewTaskWindow from "./new-task-window";
+import NewTaskWindow from "./new-task-dialog";
 import Bar from "./bar";
-import { useToast } from "../toast";
+import { useToast } from "../ui/toast";
 import { useSeedData } from "../../hooks/useSeedData";
 
 

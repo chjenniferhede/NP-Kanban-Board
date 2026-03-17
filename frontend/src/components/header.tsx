@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useMe } from "../hooks/useMe";
 import { useTeam } from "../hooks/useTeam";
 import { AVATAR_COLORS, resolveAvatarColor } from "../lib/avatarColors";
-import { useToast } from "./toast";
+import { useToast } from "./ui/toast";
 import { searchAtom } from "../hooks/useTasks";
 
 const MODAL_ID = "me-profile-modal";

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useToast } from "./ui/toast";
+import { useToast } from "../ui/toast";
 
 function loadTitle() {
   return localStorage.getItem("project-title") || "My Project";

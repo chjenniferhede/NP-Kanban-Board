@@ -2,15 +2,17 @@ import { Router, Request, Response, NextFunction } from "express";
 import { db } from "../db/client.js";
 import { tasks } from "../db/schema.js";
 import { and, eq } from "drizzle-orm";
+import { validate } from "../middleware/validate.js";
+import { getTasksQuerySchema, createTaskSchema, updateTaskSchema } from "../validators/schema-validator.js";
 
 const router: Router = Router();
 
 // GET /api/tasks
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", validate(getTasksQuerySchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { status } = req.query;
+    const { status } = req.query as { status?: "todo" | "in_progress" | "in_review" | "done" };
     const result = status
-      ? await db.select().from(tasks).where(and(eq(tasks.userId, req.userId), eq(tasks.status, status as "todo" | "in_progress" | "in_review" | "done")))
+      ? await db.select().from(tasks).where(and(eq(tasks.userId, req.userId), eq(tasks.status, status)))
       : await db.select().from(tasks).where(eq(tasks.userId, req.userId));
     res.json(result);
   } catch (err) {
@@ -30,7 +32,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // POST /api/tasks
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", validate(createTaskSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, status, description, priority, dueDate, assigneeIds } = req.body;
     const [task] = await db
@@ -44,7 +46,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // PATCH /api/tasks/:id
-router.patch("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.patch("/:id", validate(updateTaskSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, status, description, priority, dueDate, assigneeIds } = req.body;
     const [task] = await db

@@ -1,7 +1,32 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { db } from "../db/client.js";
-import { comments } from "../db/schema.js";
-import { and, eq } from "drizzle-orm";
+import { comments, tasks } from "../db/schema.js";
+import { and, eq, inArray } from "drizzle-orm";
+import { validate } from "../middleware/validate.js";
+import { createCommentSchema } from "../validators/schema-validator.js";
+
+// GET /api/comments — all comments belonging to the current user's tasks
+export const allCommentsRouter: Router = Router();
+allCommentsRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userTasks = await db
+      .select({ id: tasks.id })
+      .from(tasks)
+      .where(eq(tasks.userId, req.userId));
+
+    if (userTasks.length === 0) return res.json([]);
+
+    const taskIds = userTasks.map((t) => t.id);
+    const result = await db
+      .select()
+      .from(comments)
+      .where(inArray(comments.taskId, taskIds));
+
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
 
 const router: Router = Router({ mergeParams: true }); // mergeParams to access :taskId
 
@@ -19,7 +44,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // POST /api/tasks/:taskId/comments
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", validate(createCommentSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { text } = req.body;
     const [comment] = await db

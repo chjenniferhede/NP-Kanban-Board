@@ -4,8 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import taskRouter from "./routes/task.js";
 import teamRouter from "./routes/team.js";
-import commentRouter from "./routes/comment.js";
-import allCommentsRouter from "./routes/allComments.js";
+import commentRouter, { allCommentsRouter } from "./routes/comment.js";
 import { requireAuth } from "./middleware/auth.js";
 
 // Load environment variables from .env

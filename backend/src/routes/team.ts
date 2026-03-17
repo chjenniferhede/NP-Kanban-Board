@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from "express";
 import { db } from "../db/client.js";
 import { teamMembers } from "../db/schema.js";
 import { and, eq } from "drizzle-orm";
+import { validate } from "../middleware/validate.js";
+import { createTeamMemberSchema, updateTeamMemberSchema } from "../validators/schema-validator.js";
 
 const router: Router = Router();
 
@@ -16,7 +18,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // POST /api/team
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", validate(createTeamMemberSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, initials, color } = req.body;
     const [member] = await db
@@ -30,7 +32,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // PATCH /api/team/:id
-router.patch("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.patch("/:id", validate(updateTeamMemberSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, initials, color } = req.body;
     const [member] = await db

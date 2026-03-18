@@ -40,9 +40,9 @@ export function useSeedData(loading: boolean, fetchTasks: () => Promise<void>) {
       setTeam((prev) => [...prev, jane]);
 
       const sampleTasks = [
-        { title: "This is a sample task", description: "Try drag me!", status: "todo", priority: "high", assigneeIds: [] },
+        { title: "This is a sample task!", description: "Try drag me!", status: "todo", priority: "high", assigneeIds: [] },
         { title: "Click me to see details~", description: "Make direct edits in details", status: "in_progress", priority: "normal", assigneeIds: [jane.id] },
-        { title: "This is a kanban board!", description: "Plan a sprint--", status: "in_review", priority: "low", assigneeIds: [meMemberId, jane.id] },
+        { title: "You can also delete teammates", description: "Try hover over the avatars top right", status: "in_review", priority: "low", assigneeIds: [meMemberId, jane.id] },
       ];
 
       const createdTasks = [];

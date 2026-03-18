@@ -1,6 +1,7 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import type { Task } from "../types";
 import { sessionAtom } from "./useAuth";
+import { makeAuthHeaders } from "../lib/authHeaders";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -17,12 +18,6 @@ export function useTasks() {
   const [, setFetchErrorCode] = useAtom(fetchErrorCodeAtom);
   const session = useAtomValue(sessionAtom);
 
-  function authHeaders(): HeadersInit {
-    return {
-      "Content-Type": "application/json",
-      ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
-    };
-  }
 
   async function fetchTasks() {
     if (!session) return;
@@ -30,7 +25,7 @@ export function useTasks() {
     setFetchError(null);
     setFetchErrorCode(null);
     try {
-      const res = await fetch(`${API}/api/tasks`, { headers: authHeaders() });
+      const res = await fetch(`${API}/api/tasks`, { headers: makeAuthHeaders(session) });
       if (!res.ok) {
         setFetchErrorCode(res.status);
         setFetchError(`Failed to load tasks`);
@@ -51,7 +46,7 @@ export function useTasks() {
   ) {
     const res = await fetch(`${API}/api/tasks`, {
       method: "POST",
-      headers: authHeaders(),
+      headers: makeAuthHeaders(session),
       body: JSON.stringify({ ...fields, status: "todo" }),
     });
     if (!res.ok) throw new Error(`Failed to create task (${res.status})`);
@@ -63,7 +58,7 @@ export function useTasks() {
   async function updateTask(id: string, patch: Partial<Task>) {
     const res = await fetch(`${API}/api/tasks/${id}`, {
       method: "PATCH",
-      headers: authHeaders(),
+      headers: makeAuthHeaders(session),
       body: JSON.stringify(patch),
     });
     if (!res.ok) throw new Error(`Failed to update task (${res.status})`);
@@ -75,7 +70,7 @@ export function useTasks() {
   async function deleteTask(id: string) {
     const res = await fetch(`${API}/api/tasks/${id}`, {
       method: "DELETE",
-      headers: authHeaders(),
+      headers: makeAuthHeaders(session),
     });
     if (!res.ok) throw new Error(`Failed to delete task (${res.status})`);
     setTasks((prev) => prev.filter((t) => t.id !== id));

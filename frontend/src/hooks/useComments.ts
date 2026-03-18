@@ -1,6 +1,7 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import type { Comment } from "../types";
 import { sessionAtom } from "./useAuth";
+import { makeAuthHeaders } from "../lib/authHeaders";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -11,17 +12,10 @@ export function useComments() {
   const [commentsMap, setCommentsMap] = useAtom(commentsAtom);
   const session = useAtomValue(sessionAtom);
 
-  function authHeaders(): HeadersInit {
-    return {
-      "Content-Type": "application/json",
-      ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
-    };
-  }
-
   async function fetchAllComments() {
     if (!session) return;
     try {
-      const res = await fetch(`${API}/api/comments`, { headers: authHeaders() });
+      const res = await fetch(`${API}/api/comments`, { headers: makeAuthHeaders(session) });
       if (!res.ok) return;
       const data: Comment[] = await res.json();
       const grouped: Record<string, Comment[]> = {};

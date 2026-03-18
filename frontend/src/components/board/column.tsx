@@ -47,7 +47,7 @@ export default function Column({ columnKey, title, tasks, accent, icon, totalCou
           onScroll={handleScroll}
           className={`h-full overflow-y-auto px-3 pb-3 flex flex-col gap-2 transition-colors duration-150 ${isOver ? "bg-base-300" : ""}`}
         >
-          <Tasks columnKey={columnKey} tasks={tasks} />
+          <Tasks tasks={tasks} />
         </div>
       </div>
     </div>

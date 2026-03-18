@@ -9,6 +9,8 @@ import { sessionAtom } from "../../hooks/useAuth";
 import { useComments } from "../../hooks/useComments";
 import Tag from "../ui/tag";
 import Dropdown from "../ui/dropdown";
+import { makeAuthHeaders } from "../../lib/authHeaders";
+import { PRIORITY_CONFIG } from "../../lib/priorityConfig";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -16,12 +18,6 @@ type Props = {
   task: Task;
   onClose: () => void;
 };
-
-const PRIORITY_CONFIG = {
-  high:   { label: "High",   cls: "bg-(--color-priority-high-bg) text-(--color-priority-high-text)" },
-  normal: { label: "Medium", cls: "bg-(--color-priority-mid-bg)  text-(--color-priority-mid-text)" },
-  low:    { label: "Low",    cls: "bg-(--color-priority-low-bg)  text-(--color-priority-low-text)" },
-} as const;
 
 
 function EditableText({
@@ -100,13 +96,6 @@ export default function CardDetails({ task, onClose }: Props) {
   const [commentDraft, setCommentDraft] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
 
-  function authHeaders(): HeadersInit {
-    return {
-      "Content-Type": "application/json",
-      ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
-    };
-  }
-
   async function patch(fields: Partial<Task>) {
     try {
       await updateTask(task.id, fields);
@@ -121,7 +110,7 @@ export default function CardDetails({ task, onClose }: Props) {
     try {
       const res = await fetch(`${API}/api/tasks/${task.id}/comments`, {
         method: "POST",
-        headers: authHeaders(),
+        headers: makeAuthHeaders(session),
         body: JSON.stringify({ text: commentDraft.trim() }),
       });
       if (!res.ok) throw new Error();

@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import { useTeam } from "../../hooks/useTeam";
 import { sessionAtom } from "../../hooks/useAuth";
 import { AVATAR_COLORS, resolveAvatarColor } from "../../lib/avatarColors";
+import { getInitials } from "../../lib/initials";
 import { useToast } from "../ui/toast";
 import DeleteTeammateDialog from "../dialogs/delete-teammate-dialog";
 
@@ -36,9 +37,6 @@ export default function Team() {
     });
   }, [session?.userId]);
 
-  function getInitials(fullName: string) {
-    return fullName.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
-  }
 
   async function addTeammate() {
     if (!name.trim()) {

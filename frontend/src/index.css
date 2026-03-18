@@ -7,6 +7,14 @@
   --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
 }
 
+html {
+  font-family: var(--font-sans);
+}
+
+.project-title {
+  @apply text-2xl font-extrabold;
+}
+
 /* ── Surface / background colors ─────────────────────────────────── */
 :root {
   --color-bg-app:     #fcf8f5;   /* main app background, task card */
@@ -60,7 +68,6 @@
 }
 
 body, * {
-  font-family: var(--font-sans);
   color: #715f57;
 }
 

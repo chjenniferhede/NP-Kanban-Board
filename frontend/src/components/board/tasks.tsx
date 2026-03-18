@@ -3,7 +3,6 @@ import type { Task } from "../../../types";
 import TaskCard from "./task";
 
 type Props = {
-  columnKey: string;
   tasks: Task[];
 };
 

@@ -11,6 +11,7 @@ import { useToast } from "../ui/toast";
 import Tag from "../ui/tag";
 import CardDetails from "./task-details";
 import DeleteConfirm from "../dialogs/delete-task-dialog";
+import { PRIORITY_CONFIG } from "../../lib/priorityConfig";
 
 type Props = {
   task: Task;
@@ -28,13 +29,7 @@ export default function TaskCard({ task }: Props) {
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const priorityConfig = {
-    high:   { label: "High",   cls: "bg-(--color-priority-high-bg) text-(--color-priority-high-text)" },
-    normal: { label: "Medium", cls: "bg-(--color-priority-mid-bg)  text-(--color-priority-mid-text)" },
-    low:    { label: "Low",    cls: "bg-(--color-priority-low-bg)  text-(--color-priority-low-text)" },
-  };
-
-  const p = task.priority ? priorityConfig[task.priority] : null;
+  const p = task.priority ? PRIORITY_CONFIG[task.priority] : null;
   const { getComments } = useComments();
   const commentCount = getComments(task.id).length;
   const { deleteTask } = useTasks();
@@ -60,7 +55,7 @@ export default function TaskCard({ task }: Props) {
       >
         {/* Top badge row */}
         <div className="flex items-center justify-between gap-1">
-          {p ? <Tag label={p.label} className={p.cls} /> : <span />}
+          {p && <Tag label={p.label} className={p.cls} />}
           <div className="flex items-center gap-2 ml-auto">
             {commentCount > 0 && (
               <span className="inline-flex items-center gap-1 text-xs text-base-content/50 w-6 h-6 justify-center">

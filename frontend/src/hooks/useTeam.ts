@@ -1,6 +1,7 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import type { TeamMember } from "../types";
 import { sessionAtom } from "./useAuth";
+import { makeAuthHeaders } from "../lib/authHeaders";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -10,16 +11,9 @@ export function useTeam() {
   const [team, setTeam] = useAtom(teamAtom);
   const session = useAtomValue(sessionAtom);
 
-  function authHeaders(): HeadersInit {
-    return {
-      "Content-Type": "application/json",
-      ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
-    };
-  }
-
   async function fetchTeam() {
     if (!session) return;
-    const res = await fetch(`${API}/api/team`, { headers: authHeaders() });
+    const res = await fetch(`${API}/api/team`, { headers: makeAuthHeaders(session) });
     if (!res.ok) throw new Error(`Failed to load team (${res.status})`);
     setTeam(await res.json());
   }
@@ -27,7 +21,7 @@ export function useTeam() {
   async function createMember(fields: Pick<TeamMember, "name" | "initials" | "color">) {
     const res = await fetch(`${API}/api/team`, {
       method: "POST",
-      headers: authHeaders(),
+      headers: makeAuthHeaders(session),
       body: JSON.stringify(fields),
     });
     if (!res.ok) throw new Error("Failed to create team member");
@@ -39,7 +33,7 @@ export function useTeam() {
   async function updateMember(id: string, fields: Pick<TeamMember, "name" | "initials" | "color">) {
     const res = await fetch(`${API}/api/team/${id}`, {
       method: "PATCH",
-      headers: authHeaders(),
+      headers: makeAuthHeaders(session),
       body: JSON.stringify(fields),
     });
     if (!res.ok) throw new Error("Failed to update team member");
@@ -50,7 +44,7 @@ export function useTeam() {
   async function deleteMember(id: string) {
     const res = await fetch(`${API}/api/team/${id}`, {
       method: "DELETE",
-      headers: authHeaders(),
+      headers: makeAuthHeaders(session),
     });
     if (!res.ok) throw new Error("Failed to delete team member");
     setTeam((prev) => prev.filter((m) => m.id !== id));

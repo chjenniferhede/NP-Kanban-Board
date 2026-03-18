@@ -4,6 +4,7 @@ import logo from "../assets/vite.svg";
 import { useMe } from "../hooks/useMe";
 import { useTeam } from "../hooks/useTeam";
 import { AVATAR_COLORS, resolveAvatarColor } from "../lib/avatarColors";
+import { getInitials } from "../lib/initials";
 import { useToast } from "./ui/toast";
 import { searchAtom } from "../hooks/useTasks";
 
@@ -21,10 +22,6 @@ export default function Header() {
     setDraftName(me.name);
     setDraftColor(me.color);
     (document.getElementById(MODAL_ID) as HTMLDialogElement).showModal();
-  }
-
-  function getInitials(name: string) {
-    return name.trim().split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?";
   }
 
   async function save() {

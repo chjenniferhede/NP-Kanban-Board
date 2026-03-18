@@ -45,11 +45,27 @@ export function useSeedData(loading: boolean, fetchTasks: () => Promise<void>) {
         { title: "This is a kanban board!", description: "Plan a sprint--", status: "in_review", priority: "low", assigneeIds: [meMemberId, jane.id] },
       ];
 
+      const createdTasks = [];
       for (const task of sampleTasks) {
-        await fetch(`${API}/api/tasks`, {
+        const res = await fetch(`${API}/api/tasks`, {
           method: "POST",
           headers,
           body: JSON.stringify(task),
+        });
+        if (res.ok) createdTasks.push(await res.json());
+      }
+
+      const commentSeeds: [number, string][] = [
+        [0, "this is a comment"],
+        [0, "this is cool!"],
+        [1, "this is another comment"],
+      ];
+      for (const [idx, text] of commentSeeds) {
+        if (!createdTasks[idx]) continue;
+        await fetch(`${API}/api/tasks/${createdTasks[idx].id}/comments`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ text }),
         });
       }
 
